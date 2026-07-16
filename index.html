@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScreenDesk — Resume Fit Analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --shell: #17130E;
+    --shell-2: #211B13;
+    --panel: #F1E7D2;
+    --panel-2: #E9DCC0;
+    --panel-edge: #CBB88C;
+    --ink: #26201A;
+    --ink-soft: #756853;
+    --amber: #D9A548;
+    --amber-deep: #B9822E;
+    --good: #4F7A5B;
+    --good-bg: #E1EBDD;
+    --bad: #A0503D;
+    --bad-bg: #F2E1D8;
+    --line: #C9B78E;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 1200px 600px at 50% -10%, #2A2318 0%, transparent 60%),
+      var(--shell);
+    color: var(--panel);
+    font-family: var(--font-body);
+    min-height:100vh;
+  }
+
+  .app{ max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    display:flex; align-items:center; gap:16px;
+    margin-bottom: 36px;
+  }
+  .lens{
+    width:44px; height:44px; flex-shrink:0;
+  }
+  .masthead h1{
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 0.02em;
+    margin:0;
+    color: var(--panel);
+  }
+  .masthead p{
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #A99B7E;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- Layout ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 880px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    padding: 28px;
+    color: var(--ink);
+    position: relative;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+  }
+  .panel::before{
+    content:"";
+    position:absolute; inset: 8px;
+    border: 1px dashed var(--line);
+    border-radius: 2px;
+    pointer-events:none;
+    opacity: 0.6;
+  }
+
+  .panel-label{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
+  .panel-title{
+    font-family: var(--font-display);
+    font-size: 20px;
+    margin: 0 0 20px;
+    color: var(--ink);
+  }
+
+  label.field-label{
+    display:block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 18px 0 8px;
+  }
+  label.field-label:first-of-type{ margin-top: 0; }
+
+  textarea{
+    width:100%;
+    min-height: 120px;
+    resize: vertical;
+    background: #FBF7EC;
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  textarea:focus, .dropzone:focus-visible, button:focus-visible{
+    outline: 2px solid var(--amber-deep);
+    outline-offset: 2px;
+  }
+
+  .dropzone{
+    border: 1.5px dashed var(--panel-edge);
+    border-radius: 3px;
+    padding: 18px;
+    text-align:center;
+    cursor:pointer;
+    background: rgba(255,255,255,0.25);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone:hover, .dropzone.dragover{
+    border-color: var(--amber-deep);
+    background: rgba(217,165,72,0.12);
+  }
+  .dropzone .dz-title{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .dropzone .dz-sub{
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .dropzone input[type=file]{ display:none; }
+  .file-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    background: var(--panel-2);
+    border: 1px solid var(--panel-edge);
+    padding: 4px 10px;
+    border-radius: 2px;
+    color: var(--ink);
+  }
+
+  .analyze-btn{
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--panel);
+    border: none;
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.15s ease;
+  }
+  .analyze-btn:hover{ background: #3A3020; }
+  .analyze-btn:active{ transform: scale(0.98); }
+  .analyze-btn:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+  .status-line{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+    min-height: 14px;
+  }
+
+  /* ---------- Dossier / Results panel ---------- */
+  .dossier-empty{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height: 380px;
+    text-align:center;
+    color: var(--ink-soft);
+  }
+  .dossier-empty svg{ width:56px; height:56px; opacity:0.5; margin-bottom:14px; }
+  .dossier-empty p{ font-family: var(--font-mono); font-size: 12.5px; max-width: 260px; }
+
+  .result-top{
+    display:flex; gap: 24px; align-items:center;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .gauge-wrap{ position:relative; width:220px; flex-shrink:0; }
+  .gauge-score{
+    position:absolute;
+    top: 66px; left:0; right:0;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .gauge-score span{ font-size:14px; color: var(--ink-soft); }
+
+  .verdict-block{ flex:1; min-width: 180px; position:relative; }
+  .stamp{
+    display:inline-block;
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 3px double currentColor;
+    border-radius: 3px;
+    transform: rotate(-6deg);
+    opacity: 0;
+    animation: stampIn 0.35s ease-out 0.15s forwards;
+  }
+  @keyframes stampIn{
+    0%{ opacity:0; transform: rotate(-6deg) scale(1.4); }
+    100%{ opacity:1; transform: rotate(-6deg) scale(1); }
+  }
+  .stamp.strong{ color: var(--good); }
+  .stamp.partial{ color: var(--amber-deep); }
+  .stamp.weak{ color: var(--bad); }
+  .verdict-sub{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    line-height:1.5;
+  }
+
+  .section-divider{
+    border:none; border-top: 1px solid var(--panel-edge);
+    margin: 24px 0;
+  }
+
+  .subhead{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+  }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 20px; }
+  .tag{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .tag.match{ background: var(--good-bg); border-color: var(--good); color: var(--good); }
+  .tag.missing{ background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+  .tag-empty{ font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); font-style: italic; }
+
+  .data-sheet{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 560px){ .data-sheet{ grid-template-columns: 1fr; } }
+
+  .data-sheet dt{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+  }
+  .data-sheet dd{
+    margin: 0 0 14px;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .data-sheet dd.empty{ color: var(--ink-soft); font-style: italic; }
+
+  .privacy-note{
+    margin-top: 28px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #A99B7E;
+    text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .stamp{ animation: none; opacity:1; }
+    .needle{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="masthead">
+    <svg class="lens" viewBox="0 0 44 44" fill="none">
+      <circle cx="20" cy="20" r="13" stroke="#D9A548" stroke-width="2.5"/>
+      <line x1="29" y1="29" x2="40" y2="40" stroke="#D9A548" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="6" stroke="#D9A548" stroke-width="1.2" opacity="0.6"/>
+    </svg>
+    <div>
+      <h1>ScreenDesk</h1>
+      <p>RESUME FIT ANALYZER — RUNS ENTIRELY IN YOUR BROWSER</p>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- INTAKE PANEL -->
+    <div class="panel">
+      <p class="panel-label">Case Intake</p>
+      <h2 class="panel-title">Job &amp; Candidate</h2>
+
+      <label class="field-label" for="jd-text">Job Description</label>
+      <textarea id="jd-text" placeholder="Paste the job description here..."></textarea>
+
+      <label class="field-label">Resume File</label>
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload resume file">
+        <div class="dz-title">Drop resume here, or click to browse</div>
+        <div class="dz-sub">Supports .pdf, .docx, .txt</div>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt">
+      </div>
+      <div id="file-chip-wrap"></div>
+
+      <label class="field-label" for="resume-text">Resume Text</label>
+      <textarea id="resume-text" placeholder="...or paste resume text directly here."></textarea>
+
+      <button class="analyze-btn" id="analyze-btn">Analyze Fit</button>
+      <div class="status-line" id="status-line"></div>
+    </div>
+
+    <!-- DOSSIER / RESULTS PANEL -->
+    <div class="panel" id="results-panel">
+      <p class="panel-label">Dossier</p>
+      <h2 class="panel-title">Fit Report</h2>
+
+      <div class="dossier-empty" id="dossier-empty">
+        <svg viewBox="0 0 56 56" fill="none">
+          <rect x="10" y="6" width="36" height="46" rx="2" stroke="#756853" stroke-width="2"/>
+          <line x1="17" y1="18" x2="39" y2="18" stroke="#756853" stroke-width="2"/>
+          <line x1="17" y1="26" x2="39" y2="26" stroke="#756853" stroke-width="2"/>
+          <line x1="17" y1="34" x2="30" y2="34" stroke="#756853" stroke-width="2"/>
+        </svg>
+        <p>Awaiting a job description and resume. Fill in the intake panel and press Analyze Fit.</p>
+      </div>
+
+      <div id="dossier-results" style="display:none;">
+
+        <div class="result-top">
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 200 130" width="220">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#A0503D"/>
+                  <stop offset="50%" stop-color="#D9A548"/>
+                  <stop offset="100%" stop-color="#4F7A5B"/>
+                </linearGradient>
+              </defs>
+              <path d="M14,110 A86,86 0 0 1 186,110" fill="none" stroke="#DDD0B2" stroke-width="14" stroke-linecap="round"/>
+              <path d="M14,110 A86,86 0 0 1 186,110" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" opacity="0.9"/>
+              <line id="gauge-needle" class="needle" x1="100" y1="110" x2="30" y2="110" stroke="#26201A" stroke-width="3" stroke-linecap="round" style="transition: transform 0.7s cubic-bezier(.34,1.56,.64,1); transform-origin: 100px 110px;"/>
+              <circle cx="100" cy="110" r="6" fill="#26201A"/>
+            </svg>
+            <div class="gauge-score"><span id="gauge-score-num">0</span><span>/100</span></div>
+          </div>
+
+          <div class="verdict-block">
+            <div class="stamp" id="verdict-stamp">—</div>
+            <div class="verdict-sub" id="verdict-sub"></div>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <p class="subhead">Matched Skills</p>
+        <div class="tag-row" id="matched-tags"></div>
+
+        <p class="subhead">Missing Skills</p>
+        <div class="tag-row" id="missing-tags"></div>
+
+        <hr class="section-divider">
+
+        <p class="subhead">Candidate Details</p>
+        <dl class="data-sheet" id="candidate-sheet"></dl>
+
+        <hr class="section-divider">
+
+        <p class="subhead">Role Requirements Detected</p>
+        <dl class="data-sheet" id="role-sheet"></dl>
+
+      </div>
+    </div>
+
+  </div>
+
+  <p class="privacy-note">No files are uploaded to a server — parsing and scoring happen locally in this browser tab.</p>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+
+  // ---------- Master skill dictionary ----------
+  const SKILLS = [
+    // Programming / tech
+    "Python","Java","JavaScript","TypeScript","C++","C#","SQL","HTML","CSS","React","Node.js",
+    "Angular","Vue","PHP","Ruby","Swift","Kotlin","Go","Rust","R","MATLAB","Django","Flask",
+    // Data / analytics
+    "Excel","Power BI","Tableau","Data Analysis","Data Visualization","Machine Learning",
+    "Deep Learning","Statistics","Pandas","NumPy","TensorFlow","PyTorch","Big Data","Hadoop",
+    "Spark","ETL","Data Modeling","Dashboard Creation","A/B Testing",
+    // Cloud / devops
+    "AWS","Azure","GCP","Docker","Kubernetes","CI/CD","Jenkins","Git","Linux","DevOps",
+    // Business / finance
+    "Accounting","Financial Analysis","Budgeting","Bookkeeping","Auditing","Taxation","SAP",
+    "QuickBooks","Financial Modeling","Accounting Fundamentals","Forecasting",
+    // Marketing
+    "SEO","Content Marketing","Social Media Marketing","Google Analytics","Email Marketing","Branding",
+    // Design
+    "Photoshop","Illustrator","Figma","UI/UX Design","Canva","Adobe XD",
+    // Project management
+    "Agile","Scrum","Project Management","Jira","Trello","Kanban","Six Sigma","PMP",
+    // Office / general
+    "MS Word","MS Excel","MS PowerPoint","Google Sheets","Outlook","Basic SQL",
+    // Databases
+    "MySQL","PostgreSQL","MongoDB","Oracle","SQLite",
+    // Soft skills
+    "Communication","Communication Skills","Leadership","Teamwork","Problem Solving",
+    "Time Management","Critical Thinking","Adaptability","Creativity","Customer Service",
+    // Certifications-ish keywords
+    "CFA","CPA"
+  ];
+
+  function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function textContainsSkill(text, skill){
+    const pattern = "(^|[^a-zA-Z0-9])" + escapeRegex(skill) + "([^a-zA-Z0-9]|$)";
+    return new RegExp(pattern, "i").test(text);
+  }
+
+  // ---------- File reading ----------
+  async function readResumeFile(file){
+    const ext = file.name.split(".").pop().toLowerCase();
+    if (ext === "txt"){
+      return await file.text();
+    } else if (ext === "pdf"){
+      const buf = await file.arrayBuffer();
+      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+      let text = "";
+      for (let i = 1; i <= doc.numPages; i++){
+        const page = await doc.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(it => it.str).join(" ") + "\n";
+      }
+      return text;
+    } else if (ext === "docx"){
+      const buf = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: buf });
+      return result.value;
+    } else {
+      throw new Error("Unsupported file type: ." + ext);
+    }
+  }
+
+  // ---------- Contact / name extraction ----------
+  function extractContactInfo(text){
+    const email = text.match(/[\w.\-+]+@[\w\-]+\.[\w.\-]+/);
+    const phone = text.match(/(\+?\d{1,3}[\s-]?)?\d{4,5}[\s-]?\d{5,6}/);
+    const linkedin = text.match(/(https?:\/\/)?(www\.)?linkedin\.com\/[^\s|,]+/i);
+    return {
+      email: email ? email[0] : null,
+      phone: phone ? phone[0].trim() : null,
+      linkedin: linkedin ? linkedin[0] : null
+    };
+  }
+
+  function extractName(text){
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    for (const line of lines){
+      if (line.includes("@") || /\d/.test(line)) continue;
+      const words = line.split(/\s+/);
+      if (words.length >= 1 && words.length <= 5) return line;
+      break;
+    }
+    return null;
+  }
+
+  function extractExperienceRequirement(text){
+    const m = text.match(/(\d+)\+?\s*(?:years|yrs)\b/i);
+    return m ? m[0] : null;
+  }
+
+  // ---------- Scoring ----------
+  const STOPWORDS = new Set(["the","a","an","and","or","to","of","in","for","with","on","is","are","as","at","by","be","this","that","will","we","you","your","our"]);
+
+  function overlapScore(jdText, resumeText){
+    const tokenize = t => (t.toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !STOPWORDS.has(w));
+    const jdSet = new Set(tokenize(jdText));
+    const resumeSet = new Set(tokenize(resumeText));
+    if (jdSet.size === 0) return 0;
+    let overlap = 0;
+    jdSet.forEach(w => { if (resumeSet.has(w)) overlap++; });
+    return (overlap / jdSet.size) * 100;
+  }
+
+  function analyze(jdText, resumeText){
+    const requiredSkills = SKILLS.filter(s => textContainsSkill(jdText, s));
+    const matchedSkills = requiredSkills.filter(s => textContainsSkill(resumeText, s));
+    const missingSkills = requiredSkills.filter(s => !matchedSkills.includes(s));
+
+    const skillScore = requiredSkills.length > 0
+      ? (matchedSkills.length / requiredSkills.length) * 100
+      : 0;
+    const kwScore = overlapScore(jdText, resumeText);
+
+    const finalScore = requiredSkills.length > 0
+      ? Math.round(0.75 * skillScore + 0.25 * kwScore)
+      : Math.round(kwScore);
+
+    const candidate = extractContactInfo(resumeText);
+    candidate.name = extractName(resumeText);
+    candidate.skillsFound = SKILLS.filter(s => textContainsSkill(resumeText, s));
+
+    const role = {
+      title: extractName(jdText),
+      experience: extractExperienceRequirement(jdText),
+      requiredSkills
+    };
+
+    return {
+      finalScore: Math.max(0, Math.min(100, finalScore)),
+      matchedSkills, missingSkills, requiredSkills,
+      candidate, role
+    };
+  }
+
+  // ---------- Rendering ----------
+  function verdictFor(score){
+    if (score >= 75) return { label: "Strong Fit", cls: "strong", note: "Candidate covers most of the role's required skills." };
+    if (score >= 50) return { label: "Partial Fit", cls: "partial", note: "Candidate meets some requirements; review the gaps below." };
+    return { label: "Weak Fit", cls: "weak", note: "Significant gaps between the resume and role requirements." };
+  }
+
+  function renderTags(container, items, cls, emptyLabel){
+    container.innerHTML = "";
+    if (items.length === 0){
+      const span = document.createElement("span");
+      span.className = "tag-empty";
+      span.textContent = emptyLabel;
+      container.appendChild(span);
+      return;
+    }
+    items.forEach(s => {
+      const span = document.createElement("span");
+      span.className = "tag " + cls;
+      span.textContent = (cls === "match" ? "✓ " : "✕ ") + s;
+      container.appendChild(span);
+    });
+  }
+
+  function ddPair(dl, term, value){
+    const dt = document.createElement("dt");
+    dt.textContent = term;
+    const dd = document.createElement("dd");
+    if (value){
+      dd.textContent = value;
+    } else {
+      dd.textContent = "Not found";
+      dd.className = "empty";
+    }
+    dl.appendChild(dt);
+    dl.appendChild(dd);
+  }
+
+  function renderResults(result){
+    document.getElementById("dossier-empty").style.display = "none";
+    document.getElementById("dossier-results").style.display = "block";
+
+    document.getElementById("gauge-score-num").textContent = result.finalScore;
+    const angle = 180 - (result.finalScore / 100) * 180;
+    const rad = angle * Math.PI / 180;
+    const x2 = 100 + 70 * Math.cos(rad);
+    const y2 = 110 - 70 * Math.sin(rad);
+    const needle = document.getElementById("gauge-needle");
+    needle.setAttribute("x2", x2.toFixed(1));
+    needle.setAttribute("y2", y2.toFixed(1));
+
+    const v = verdictFor(result.finalScore);
+    const stamp = document.getElementById("verdict-stamp");
+    stamp.textContent = v.label;
+    stamp.className = "stamp " + v.cls;
+    // restart animation
+    stamp.style.animation = "none";
+    void stamp.offsetWidth;
+    stamp.style.animation = "";
+    document.getElementById("verdict-sub").textContent = v.note;
+
+    renderTags(document.getElementById("matched-tags"), result.matchedSkills, "match", "No required skills matched.");
+    renderTags(document.getElementById("missing-tags"), result.missingSkills, "missing", "No skill gaps detected.");
+
+    const candSheet = document.getElementById("candidate-sheet");
+    candSheet.innerHTML = "";
+    ddPair(candSheet, "Name", result.candidate.name);
+    ddPair(candSheet, "Email", result.candidate.email);
+    ddPair(candSheet, "Phone", result.candidate.phone);
+    ddPair(candSheet, "LinkedIn", result.candidate.linkedin);
+    ddPair(candSheet, "Skills Detected", result.candidate.skillsFound.length ? result.candidate.skillsFound.join(", ") : null);
+
+    const roleSheet = document.getElementById("role-sheet");
+    roleSheet.innerHTML = "";
+    ddPair(roleSheet, "Role / Title Line", result.role.title);
+    ddPair(roleSheet, "Experience Required", result.role.experience);
+    ddPair(roleSheet, "Required Skills Found", result.role.requiredSkills.length ? result.role.requiredSkills.join(", ") : null);
+  }
+
+  // ---------- Wiring ----------
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-input");
+  const chipWrap = document.getElementById("file-chip-wrap");
+  const resumeText = document.getElementById("resume-text");
+  const jdText = document.getElementById("jd-text");
+  const statusLine = document.getElementById("status-line");
+  const analyzeBtn = document.getElementById("analyze-btn");
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
+  dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("dragover"); });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+  });
+
+  async function handleFile(file){
+    chipWrap.innerHTML = `<span class="file-chip">📄 ${file.name}</span>`;
+    statusLine.textContent = "Reading " + file.name + " ...";
+    try{
+      const text = await readResumeFile(file);
+      resumeText.value = text.trim();
+      statusLine.textContent = "Loaded " + file.name + " (" + text.length + " characters).";
+    } catch(err){
+      statusLine.textContent = "Could not read file: " + err.message;
+    }
+  }
+
+  analyzeBtn.addEventListener("click", () => {
+    const jd = jdText.value.trim();
+    const resume = resumeText.value.trim();
+    if (!jd || !resume){
+      statusLine.textContent = "Add both a job description and a resume before analyzing.";
+      return;
+    }
+    statusLine.textContent = "Analysis complete.";
+    const result = analyze(jd, resume);
+    renderResults(result);
+  });
+</script>
+</body>
+</html>
