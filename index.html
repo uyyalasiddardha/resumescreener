@@ -1658,20 +1658,29 @@ demoBtn.addEventListener("click", () => {
 
    resumeText.value = `Uyyala Siddardha
 B.Com (Computer Applications)
+uyyalasiddardha901@gmail.com
+linkedin.com/in/uyyalasiddardha
+github.com/uyyalasiddardha
+9550021877
 
 Skills:
 - Microsoft Excel
 - Power BI
-- SQL
-- Python
+- Basic MySQL
+- Dashboard Creation
 - Data Analysis
 - Communication
-- Problem Solving
+- Data Visualization
 
 Projects:
 - Sales Dashboard using Power BI
 - AI Resume Screening Tool
 - Student Attendance Report
+
+Certifications:
+- Advanced Excel With AI Online Short-Term Internship
+- Power BI For Beginners
+- Indian Red Cross Society — Participation Certificate  
 
 Education:
 B.Com (Computer Applications)`;
@@ -1679,16 +1688,22 @@ B.Com (Computer Applications)`;
     statusLine.textContent = "Sample data loaded. Click Analyze Fit.";
 });
   analyzeBtn.addEventListener("click", () => {
+    analyzeBtn.textContent = "Analyzing...";
+analyzeBtn.disabled = true;
     const jd = jdText.value.trim();
     const resume = resumeText.value.trim();
     if (!jd || !resume){
       statusLine.textContent = "Add both a job description and a resume before analyzing.";
+      analyzeBtn.textContent = "Analyze Fit";
+analyzeBtn.disabled = false;
       return;
     }
     statusLine.textContent = "Analysis complete.";
     const result = analyze(jd, resume, detectedNameHint);
     lastAnalysisResult = result;
     renderResults(result);
+    analyzeBtn.textContent = "Analyze Fit";
+analyzeBtn.disabled = false;
   });
 
   // Fully resets the application to its initial state without a page reload:
