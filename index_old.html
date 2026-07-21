@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WWK9YJPCDY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WWK9YJPCDY');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="g1OZ4rVFRZPIqJxLPnePNIC_NewxoZy-3df5k7VDMJ4" />
+<title>AI Resume Screening Tool | ATS Resume Checker | ScreenDesk</title>
+<meta name="description" content="ScreenDesk is an AI-powered ATS resume checker that analyzes resumes against job descriptions, provides match scores, identifies missing keywords, and helps job seekers improve their resumes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --shell: #17130E;
+    --shell-2: #211B13;
+    --panel: #F1E7D2;
+    --panel-2: #E9DCC0;
+    --panel-edge: #CBB88C;
+    --ink: #26201A;
+    --ink-soft: #756853;
+    --amber: #D9A548;
+    --amber-deep: #B9822E;
+    --good: #4F7A5B;
+    --good-bg: #E1EBDD;
+    --bad: #A0503D;
+    --bad-bg: #F2E1D8;
+    --line: #C9B78E;
+    --score-excellent: #3E8A5D;
+    --score-good: #3B6EA5;
+    --score-average: #C98A2E;
+    --score-poor: #A0503D;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 1200px 600px at 50% -10%, #2A2318 0%, transparent 60%),
+      var(--shell);
+    color: var(--panel);
+    font-family: var(--font-body);
+    min-height:100vh;
+  }
+
+  .app{ max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    display:flex; align-items:center; gap:16px;
+    margin-bottom: 36px;
+  }
+  .lens{
+    width:44px; height:44px; flex-shrink:0;
+  }
+  .masthead h1{
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 0.02em;
+    margin:0;
+    color: var(--panel);
+  }
+  .masthead p{
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #A99B7E;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- Layout ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 880px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    padding: 28px;
+    color: var(--ink);
+    position: relative;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+  }
+  .panel::before{
+    content:"";
+    position:absolute; inset: 8px;
+    border: 1px dashed var(--line);
+    border-radius: 2px;
+    pointer-events:none;
+    opacity: 0.6;
+  }
+
+  .panel-label{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
+  .panel-title{
+    font-family: var(--font-display);
+    font-size: 20px;
+    margin: 0 0 20px;
+    color: var(--ink);
+  }
+
+  label.field-label{
+    display:block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 18px 0 8px;
+  }
+  label.field-label:first-of-type{ margin-top: 0; }
+
+  textarea{
+    width:100%;
+    min-height: 120px;
+    resize: vertical;
+    background: #FBF7EC;
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  textarea:focus, .dropzone:focus-visible, button:focus-visible{
+    outline: 2px solid var(--amber-deep);
+    outline-offset: 2px;
+  }
+
+  .dropzone{
+    border: 1.5px dashed var(--panel-edge);
+    border-radius: 3px;
+    padding: 18px;
+    text-align:center;
+    cursor:pointer;
+    background: rgba(255,255,255,0.25);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone:hover, .dropzone.dragover{
+    border-color: var(--amber-deep);
+    background: rgba(217,165,72,0.12);
+  }
+  .dropzone .dz-title{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .dropzone .dz-sub{
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .dropzone input[type=file]{ display:none; }
+  .file-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    background: var(--panel-2);
+    border: 1px solid var(--panel-edge);
+    padding: 4px 10px;
+    border-radius: 2px;
+    color: var(--ink);
+  }
+
+  .button-row{
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .button-row .analyze-btn{ margin-top: 0; flex: 1; }
+
+  .analyze-btn{
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--panel);
+    border: none;
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.15s ease;
+  }
+  .analyze-btn:hover{ background: #3A3020; }
+  .analyze-btn:active{ transform: scale(0.98); }
+  .analyze-btn:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+  .clear-btn{
+    padding: 14px 20px;
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--panel-edge);
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .clear-btn:hover{ background: rgba(160,80,61,0.08); border-color: var(--bad); color: var(--bad); }
+  .clear-btn:active{ transform: scale(0.98); }
+
+  .download-btn{
+    margin-top: 24px;
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .download-btn:hover{ background: var(--ink); color: var(--panel); }
+  .download-btn:active{ transform: scale(0.98); }
+
+  .status-line{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+    min-height: 14px;
+  }
+
+  /* ---------- Dossier / Results panel ---------- */
+  .dossier-empty{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height: 380px;
+    text-align:center;
+    color: var(--ink-soft);
+  }
+  .dossier-empty svg{ width:56px; height:56px; opacity:0.5; margin-bottom:14px; }
+  .dossier-empty p{ font-family: var(--font-mono); font-size: 12.5px; max-width: 260px; }
+
+  /* ---------- Score Summary (Resume Match Score + ATS Score) ---------- */
+  .score-summary{
+    display:flex; gap: 28px; align-items:center;
+    flex-wrap: wrap;
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--panel-edge);
+  }
+
+  .match-circle-wrap{
+    position: relative;
+    width: 132px; height: 132px;
+    flex-shrink: 0;
+  }
+  .match-circle-wrap svg{ transform: rotate(-90deg); width:132px; height:132px; }
+  .match-circle-track{ fill:none; stroke: #DDD0B2; stroke-width: 10; }
+  .match-circle-fill{
+    fill:none; stroke-width: 10; stroke-linecap: round;
+    transition: stroke-dashoffset 0.9s cubic-bezier(.34,1.56,.64,1), stroke 0.4s ease;
+  }
+  .match-circle-label{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .match-circle-num{
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .match-circle-num span{ font-size: 13px; color: var(--ink-soft); }
+  .match-circle-tag{
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .ats-block{ flex: 1; min-width: 240px; }
+  .ats-header{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom: 8px;
+  }
+  .ats-header .ats-title{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .ats-header .ats-num{
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .ats-bar-track{
+    width:100%; height: 10px;
+    background: #DDD0B2;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .ats-bar-fill{
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.9s cubic-bezier(.34,1.56,.64,1), background 0.4s ease;
+  }
+  .ats-reasons{
+    list-style:none; margin: 12px 0 0; padding:0;
+    display:flex; flex-direction:column; gap: 5px;
+  }
+  .ats-reasons li{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    display:flex; align-items:flex-start; gap: 7px;
+  }
+  .ats-reasons li.ok{ color: var(--good); }
+  .ats-reasons li.warn{ color: var(--bad); }
+
+  .result-top{
+    display:flex; gap: 24px; align-items:center;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .gauge-wrap{ position:relative; width:220px; flex-shrink:0; }
+  .gauge-score{
+    position:absolute;
+    top: 66px; left:0; right:0;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .gauge-score span{ font-size:14px; color: var(--ink-soft); }
+
+  .verdict-block{ flex:1; min-width: 180px; position:relative; }
+  .stamp{
+    display:inline-block;
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 3px double currentColor;
+    border-radius: 3px;
+    transform: rotate(-6deg);
+    opacity: 0;
+    animation: stampIn 0.35s ease-out 0.15s forwards;
+  }
+  @keyframes stampIn{
+    0%{ opacity:0; transform: rotate(-6deg) scale(1.4); }
+    100%{ opacity:1; transform: rotate(-6deg) scale(1); }
+  }
+  .stamp.excellent{ color: var(--score-excellent); }
+  .stamp.good{ color: var(--score-good); }
+  .stamp.average{ color: var(--score-average); }
+  .stamp.poor{ color: var(--score-poor); }
+  .verdict-sub{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    line-height:1.5;
+  }
+
+  .section-divider{
+    border:none; border-top: 1px solid var(--panel-edge);
+    margin: 24px 0;
+  }
+
+  .subhead{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+  }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 20px; }
+  .tag{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .tag.match{ background: var(--good-bg); border-color: var(--good); color: var(--good); }
+  .tag.missing{ background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+  .tag-empty{ font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); font-style: italic; }
+
+  .data-sheet{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 560px){ .data-sheet{ grid-template-columns: 1fr; } }
+  @media (max-width: 480px){
+    .score-summary{ flex-direction: column; align-items: flex-start; }
+    .match-circle-wrap{ align-self: center; }
+  }
+
+  .data-sheet dt{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+  }
+  .data-sheet dd{
+    margin: 0 0 14px;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .data-sheet dd.empty{ color: var(--ink-soft); font-style: italic; }
+
+  .privacy-note{
+    margin-top: 28px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #A99B7E;
+    text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .stamp{ animation: none; opacity:1; }
+    .needle{ transition: none !important; }
+    .match-circle-fill, .ats-bar-fill{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="masthead">
+    <svg class="lens" viewBox="0 0 44 44" fill="none">
+      <circle cx="20" cy="20" r="13" stroke="#D9A548" stroke-width="2.5"/>
+      <line x1="29" y1="29" x2="40" y2="40" stroke="#D9A548" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="6" stroke="#D9A548" stroke-width="1.2" opacity="0.6"/>
+    </svg>
+    <div>
+      <h1>ScreenDesk</h1>
+      <p>AI-POWERED RESUME SCREENING & ATS ANALYSIS</p>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- INTAKE PANEL -->
+    <div class="panel">
+      <p class="panel-label">Case Intake</p>
+      <h2 class="panel-title">Job &amp; Candidate</h2>
+
+      <label class="field-label" for="jd-text">Job Description</label>
+      <textarea id="jd-text" placeholder="Paste the job description here..."></textarea>
+
+      <label class="field-label">Resume File</label>
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload resume file">
+        <div class="dz-title">Drop resume here, or click to browse</div>
+        <div class="dz-sub">Supports .pdf, .docx, .txt</div>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt">
+      </div>
+      <div id="file-chip-wrap"></div>
+
+      <label class="field-label" for="resume-text">Resume Text</label>
+      <textarea id="resume-text" placeholder="...or paste resume text directly here."></textarea>
+
+      <div class="button-row">
+    <button class="clear-btn" id="demo-btn" type="button"> Try Demo</button>
+    <button class="analyze-btn" id="analyze-btn">Analyze Fit</button>
+    <button class="clear-btn" id="clear-btn" type="button">Clear</button>
+</div>
+      <div class="status-line" id="status-line"></div>
+    </div>
+
+    <!-- DOSSIER / RESULTS PANEL -->
+    <div class="panel" id="results-panel">
+      <p class="panel-label">Dossier</p>
+      <h2 class="panel-title">Fit Report</h2>
+
+      <div class="dossier-empty" id="dossier-empty">
+        <svg viewBox="0 0 56 56" fill="none">
+          <rect x="10" y="6" width="36" height="46" rx="2" stroke="#756853" stroke-width="2"/>
+          <line x1="17" y1="18" x2="39" y2="18" stroke="#756853" stroke-width="2"/>
+          <line x1="17" y1="26" x2="39" y2="26" stroke="#756853" stroke-width="2"/>
+          <line x1="17" y1="34" x2="30" y2="34" stroke="#756853" stroke-width="2"/>
+        </svg>
+        <p>Awaiting a job description and resume. Fill in the intake panel and press Analyze Fit.</p>
+      </div>
+
+      <div id="dossier-results" style="display:none;">
+
+        <div class="score-summary">
+          <div class="match-circle-wrap">
+            <svg viewBox="0 0 132 132">
+              <circle class="match-circle-track" cx="66" cy="66" r="54"></circle>
+              <circle class="match-circle-fill" id="match-circle-fill" cx="66" cy="66" r="54"
+                stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke="#3E8A5D"></circle>
+            </svg>
+            <div class="match-circle-label">
+              <div class="match-circle-num"><span id="match-score-num">0</span><span>%</span></div>
+              <div class="match-circle-tag" id="match-score-tag">—</div>
+            </div>
+          </div>
+
+          <div class="ats-block">
+            <div class="ats-header">
+              <span class="ats-title">ATS Compatibility Score</span>
+              <span class="ats-num" id="ats-score-num">0%</span>
+            </div>
+            <div class="ats-bar-track">
+              <div class="ats-bar-fill" id="ats-bar-fill"></div>
+            </div>
+            <ul class="ats-reasons" id="ats-reasons"></ul>
+          </div>
+        </div>
+
+        <div class="result-top">
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 200 130" width="220">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#A0503D"/>
+                  <stop offset="50%" stop-color="#D9A548"/>
+                  <stop offset="100%" stop-color="#4F7A5B"/>
+                </linearGradient>
+              </defs>
+              <path d="M14,110 A86,86 0 0 1 186,110" fill="none" stroke="#DDD0B2" stroke-width="14" stroke-linecap="round"/>
+              <path d="M14,110 A86,86 0 0 1 186,110" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" opacity="0.9"/>
+              <line id="gauge-needle" class="needle" x1="100" y1="110" x2="30" y2="110" stroke="#26201A" stroke-width="3" stroke-linecap="round" style="transition: transform 0.7s cubic-bezier(.34,1.56,.64,1); transform-origin: 100px 110px;"/>
+              <circle cx="100" cy="110" r="6" fill="#26201A"/>
+            </svg>
+            <div class="gauge-score"><span id="gauge-score-num">0</span><span>/100</span></div>
+          </div>
+
+          <div class="verdict-block">
+            <div class="stamp" id="verdict-stamp">—</div>
+            <div class="verdict-sub" id="verdict-sub"></div>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <p class="subhead">Matched Skills</p>
+        <div class="tag-row" id="matched-tags"></div>
+
+        <p class="subhead">Missing Skills</p>
+        <div class="tag-row" id="missing-tags"></div>
+
+        <hr class="section-divider">
+
+        <p class="subhead">Candidate Details</p>
+        <dl class="data-sheet" id="candidate-sheet"></dl>
+
+        <hr class="section-divider">
+
+        <p class="subhead">Role Requirements Detected</p>
+        <dl class="data-sheet" id="role-sheet"></dl>
+
+        <button class="download-btn" id="download-pdf-btn" type="button">Download PDF Report</button>
+
+      </div>
+    </div>
+
+  </div>
+
+  <p class="privacy-note">No files are uploaded to a server — parsing and scoring happen locally in this browser tab.</p>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+
+  // ---------- Master skill dictionary ----------
+  const SKILLS = [
+    // Programming / tech
+    "Python","Java","JavaScript","TypeScript","C++","C#","SQL","HTML","CSS","React","Node.js",
+    "Angular","Vue","PHP","Ruby","Swift","Kotlin","Go","Rust","R","MATLAB","Django","Flask",
+    // Data / analytics
+    "Excel","Power BI","Tableau","Data Analysis","Data Visualization","Machine Learning",
+    "Deep Learning","Statistics","Pandas","NumPy","TensorFlow","PyTorch","Big Data","Hadoop",
+    "Spark","ETL","Data Modeling","Dashboard Creation","A/B Testing",
+    // Cloud / devops
+    "AWS","Azure","GCP","Docker","Kubernetes","CI/CD","Jenkins","Git","Linux","DevOps",
+    // Business / finance
+    "Accounting Fundamentals","Financial Analysis","Budgeting","Bookkeeping","Auditing","Taxation","SAP",
+    "QuickBooks","Financial Modeling","Forecasting",
+    // Marketing
+    "SEO","Content Marketing","Social Media Marketing","Google Analytics","Email Marketing","Branding",
+    // Design
+    "Photoshop","Illustrator","Figma","UI/UX Design","Canva","Adobe XD",
+    // Project management
+    "Agile","Scrum","Project Management","Jira","Trello","Kanban","Six Sigma","PMP",
+    // Office / general
+    "MS Word","MS PowerPoint","Google Sheets","Outlook",
+    // Databases
+    "MySQL","PostgreSQL","MongoDB","Oracle","SQLite",
+    // Soft skills
+    "Communication Skills","Leadership","Teamwork","Problem Solving",
+    "Time Management","Critical Thinking","Adaptability","Creativity","Customer Service",
+    // Certifications-ish keywords
+    "CFA","CPA"
+  ];
+
+  // Synonym map: alias (lowercase) -> canonical skill name from SKILLS above.
+  // Lets "MS Excel" and "Excel", or "Communication" and "Communication
+  // Skills", be recognized as the same skill instead of separate entries.
+  const SKILL_ALIASES = {
+    "ms excel": "Excel", "microsoft excel": "Excel", "excel": "Excel",
+    "basic sql": "SQL", "sql": "SQL", "structured query language": "SQL",
+    "basic mysql": "MySQL",
+    "communication": "Communication Skills", "communication skill": "Communication Skills",
+    "powerbi": "Power BI", "power-bi": "Power BI",
+    "ms word": "MS Word", "microsoft word": "MS Word",
+    "ms powerpoint": "MS PowerPoint", "microsoft powerpoint": "MS PowerPoint", "powerpoint": "MS PowerPoint",
+    "js": "JavaScript",
+    "ui/ux design": "UI/UX Design", "ui ux design": "UI/UX Design", "ux design": "UI/UX Design", "ui design": "UI/UX Design",
+    "accounting": "Accounting Fundamentals", "basic accounting": "Accounting Fundamentals",
+    "nodejs": "Node.js", "node": "Node.js",
+    "reactjs": "React", "react.js": "React",
+    "vuejs": "Vue", "vue.js": "Vue",
+    "postgres": "PostgreSQL",
+    "google cloud": "GCP", "google cloud platform": "GCP",
+    "amazon web services": "AWS",
+    "microsoft azure": "Azure",
+    "dashboarding": "Dashboard Creation", "dashboards": "Dashboard Creation"
+  };
+
+  // Returns the set of canonical skills (deduped) found anywhere in text,
+  // checking both direct SKILLS matches and known synonym aliases.
+  function findCanonicalSkillsInText(text){
+    const found = new Set();
+    SKILLS.forEach(skill => { if (textContainsSkill(text, skill)) found.add(skill); });
+    Object.keys(SKILL_ALIASES).forEach(alias => {
+      if (textContainsSkill(text, alias)) found.add(SKILL_ALIASES[alias]);
+    });
+    return found;
+  }
+
+  function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function textContainsSkill(text, skill){
+    const pattern = "(^|[^a-zA-Z0-9])" + escapeRegex(skill) + "([^a-zA-Z0-9]|$)";
+    return new RegExp(pattern, "i").test(text);
+  }
+
+  // ---------- Ignore-keyword rules for name detection (rebuilt from scratch) ----------
+  // Any line CONTAINING one of these words/phrases is ignored as a name
+  // candidate. Substring match (not exact-line match) so it catches these
+  // terms regardless of surrounding punctuation or list formatting.
+  const IGNORE_KEYWORDS = [
+    "career", "objective", "technical skills", "skills", "projects", "project",
+    "internship", "internships", "education", "certifications", "certificate",
+    "languages", "language", "ms excel", "power bi", "dashboard creation",
+    "basic mysql", "basic sql", "communication skills", "accounting fundamentals",
+    "summary", "profile", "experience", "achievement", "award", "reference",
+    "declaration", "hobbies", "interest", "training"
+  ];
+
+  function isIgnoredLine(line){
+    const norm = line.trim().toLowerCase();
+    if (!norm) return true;
+    if (IGNORE_KEYWORDS.some(kw => norm.includes(kw))) return true;
+    // Also reject if the line is exactly a known skill term from the SKILLS list
+    const cleaned = norm.replace(/[:\-–]+$/, "").trim();
+    if (SKILLS.some(s => s.toLowerCase() === cleaned)) return true;
+    return false;
+  }
+
+  // ---------- File reading ----------
+  function cleanExtractedText(text){
+    if (!text) return "";
+    text = text.replace(/[•▪●♦◦‣∙·]/g, "-");
+    text = text.replace(/\r\n/g, "\n");
+    text = text.replace(/[ \t]+/g, " ");
+    text = text.split("\n").map(l => l.trim()).join("\n");
+    text = text.replace(/\n{3,}/g, "\n\n");
+    return text.trim();
+  }
+
+  // Extracts text from a PDF using gap-aware reconstruction: instead of
+  // blindly joining every text item with a space (which corrupts URLs and
+  // emails when pdf.js splits a word into multiple items for kerning
+  // reasons), a space is only inserted when there's an actual visual gap
+  // between items. Also detects the largest-font text near the top of the
+  // first page as a strong name hint (headings/contact-like lines excluded).
+  async function extractPdfContent(doc){
+    let text = "";
+    let nameHint = null;
+    let maxNameFontSize = 0;
+    let page1LineIndex = 0;
+
+    for (let pageNum = 1; pageNum <= doc.numPages; pageNum++){
+      const page = await doc.getPage(pageNum);
+      const content = await page.getTextContent();
+      const items = content.items.filter(it => it.str && it.str.trim().length > 0);
+
+      // Reading order: top-to-bottom, then left-to-right
+      items.sort((a, b) => {
+        const yDiff = b.transform[5] - a.transform[5];
+        if (Math.abs(yDiff) > 2) return yDiff;
+        return a.transform[4] - b.transform[4];
+      });
+
+      // Group into visual lines using an adaptive y-threshold based on font size
+      const lines = [];
+      let currentLine = [];
+      let lastY = null;
+      items.forEach(item => {
+        const y = item.transform[5];
+        const fontSize = Math.hypot(item.transform[0], item.transform[1]) || 10;
+        const threshold = Math.max(2.5, fontSize * 0.35);
+        if (lastY === null || Math.abs(y - lastY) < threshold){
+          currentLine.push(item);
+        } else {
+          lines.push(currentLine);
+          currentLine = [item];
+        }
+        lastY = y;
+      });
+      if (currentLine.length) lines.push(currentLine);
+
+      lines.forEach(lineItems => {
+        lineItems.sort((a, b) => a.transform[4] - b.transform[4]);
+        let lineText = "";
+        let prevItem = null;
+        let maxFontInLine = 0;
+        lineItems.forEach(item => {
+          const fontSize = Math.hypot(item.transform[0], item.transform[1]) || 10;
+          maxFontInLine = Math.max(maxFontInLine, fontSize);
+          if (prevItem){
+            const prevEnd = prevItem.transform[4] + (prevItem.width || 0);
+            const gap = item.transform[4] - prevEnd;
+            // Only insert a space when there's a real visual gap; otherwise
+            // the item is a continuation of the same word/token.
+            if (gap > fontSize * 0.2) lineText += " ";
+          }
+          lineText += item.str;
+          prevItem = item;
+        });
+        lineText = lineText.trim();
+        if (!lineText) return;
+        text += lineText + "\n";
+
+        // Name detection reads ONLY the first 10 lines of the first page.
+        if (pageNum === 1){
+          page1LineIndex++;
+          if (page1LineIndex <= 10){
+            const isAllUpper = lineText === lineText.toUpperCase() && /[A-Z]/.test(lineText);
+            const wordCount = lineText.split(/\s+/).length;
+            if (!isIgnoredLine(lineText) && isAllUpper && wordCount >= 1 && wordCount <= 6 &&
+                maxFontInLine > maxNameFontSize){
+              maxNameFontSize = maxFontInLine;
+              nameHint = lineText;
+            }
+          }
+        }
+      });
+      text += "\n";
+    }
+
+    return { text, nameHint };
+  }
+
+  async function readResumeFile(file){
+    const ext = file.name.split(".").pop().toLowerCase();
+    if (ext === "txt"){
+      return { text: await file.text(), nameHint: null };
+    } else if (ext === "pdf"){
+      const buf = await file.arrayBuffer();
+      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+      return await extractPdfContent(doc);
+    } else if (ext === "docx"){
+      const buf = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: buf });
+      return { text: result.value, nameHint: null };
+    } else {
+      throw new Error("Unsupported file type: ." + ext);
+    }
+  }
+
+  // ---------- Resume field extraction engine ----------
+
+  // ===== Contact Parser (rebuilt from scratch, take 3) =====
+  // Name: read ONLY the first 10 lines of the resume, ignore any line
+  // containing a section-heading or skill keyword, choose the largest
+  // uppercase line as the name. Email/Phone/LinkedIn/GitHub: matched
+  // anywhere in the document.
+
+  function extractEmailAddress(text){
+    const m = text.match(/[\w.\-+]+@[\w\-]+\.[\w.\-]+/);
+    return m ? m[0] : null;
+  }
+
+  // Indian mobile numbers, with or without +91 / a leading 0, tolerant of
+  // spaces and hyphens. Always returns the bare 10-digit number (no country
+  // code prefix). Falls back to a general international pattern otherwise.
+  function extractIndianPhoneNumber(text){
+    let m = text.match(/\+91[\s-]?[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b/);
+    if (m) return m[0].replace(/\D/g, "").slice(2);
+
+    m = text.match(/\b0[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b/);
+    if (m) return m[0].replace(/\D/g, "").slice(1);
+
+    m = text.match(/\b[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b/);
+    if (m) return m[0].replace(/\D/g, "");
+
+    const candidates = text.match(/(\+?\d[\d\s().-]{7,}\d)/g) || [];
+    for (const cand of candidates){
+      const digits = cand.replace(/\D/g, "");
+      if (digits.length >= 10 && digits.length <= 13) return cand.trim();
+    }
+    return null;
+  }
+
+  function cleanUrl(rawMatch){
+    return rawMatch.trim().replace(/[),.;]+$/, "").replace(/^https?:\/\//i, "").replace(/^www\./i, "");
+  }
+
+  // Finds a linkedin.com or github.com URL anywhere in the resume, even
+  // when the URL is split across lines from its label, or only a bare
+  // username follows the label.
+  function extractProfileUrl(text, platform){
+    const domainRegex = new RegExp("(https?:\\/\\/)?(www\\.)?" + platform + "\\.com\\/[^\\s|,]+", "i");
+
+    const direct = text.match(domainRegex);
+    if (direct) return cleanUrl(direct[0]);
+
+    const lines = text.split("\n");
+    const labelRegex = new RegExp(platform, "i");
+    for (let i = 0; i < lines.length; i++){
+      if (!labelRegex.test(lines[i])) continue;
+
+      const sameLineAfterLabel = lines[i].replace(new RegExp(".*" + platform + "[^:]*:?", "i"), "").trim();
+      const nextLine = (lines[i + 1] || "").trim();
+      const candidateText = sameLineAfterLabel || nextLine;
+      if (!candidateText) continue;
+
+      const domainInCandidate = candidateText.match(domainRegex);
+      if (domainInCandidate) return cleanUrl(domainInCandidate[0]);
+
+      const token = candidateText.split(/\s+/)[0].replace(/[,.;]+$/, "");
+      if (token && token.length >= 3 && !/@/.test(token)){
+        const path = platform === "linkedin" ? "in/" : "";
+        return platform + ".com/" + path + token.replace(/^\/+/, "");
+      }
+    }
+    return null;
+  }
+
+  function extractContactInfo(text){
+    return {
+      email: extractEmailAddress(text),
+      phone: extractIndianPhoneNumber(text),
+      linkedin: extractProfileUrl(text, "linkedin"),
+      github: extractProfileUrl(text, "github")
+    };
+  }
+
+  // Text-based name detection: reads ONLY the first 10 non-empty lines,
+  // discards every line matched by isIgnoredLine (section headings, skill
+  // terms), and chooses the LARGEST uppercase line among what remains —
+  // "largest" measured by character length, since plain text carries no
+  // font-size information. Falls back to a mixed-case candidate only if no
+  // uppercase line qualifies at all.
+  function extractCandidateNameFromText(text){
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean).slice(0, 10);
+    const upperCandidates = [];
+    const otherCandidates = [];
+
+    for (const rawLine of lines){
+      const line = rawLine.replace(/^(name|full name)\s*[:\-]\s*/i, "").trim();
+      if (!line || isIgnoredLine(line)) continue;
+      if (/@/.test(line) || /\d/.test(line)) continue;
+      if (/^(https?:\/\/|www\.)/i.test(line)) continue;
+      if (/linkedin|github/i.test(line)) continue;
+
+      const words = line.split(/\s+/);
+      if (words.length < 1 || words.length > 6) continue;
+      if (!/[A-Za-z]/.test(line)) continue;
+
+      const isAllUpper = line === line.toUpperCase();
+      if (isAllUpper) upperCandidates.push(line);
+      else otherCandidates.push(line);
+    }
+
+    if (upperCandidates.length){
+      // "Largest" = longest line by character count (proxy for biggest heading)
+      upperCandidates.sort((a, b) => b.length - a.length);
+      return upperCandidates[0];
+    }
+    return otherCandidates.length ? otherCandidates[0] : null;
+  }
+
+  // Final name resolution: a validated PDF font-size hint (the actual
+  // largest uppercase text within the first 10 lines of page 1) takes
+  // priority since it's measured from real font sizes; falls back to the
+  // text-based scan for DOCX/TXT/pasted resumes.
+  function extractCandidateName(text, pdfNameHint){
+    if (pdfNameHint){
+      const clean = pdfNameHint.trim();
+      if (clean && !isIgnoredLine(clean) && clean === clean.toUpperCase() && /[A-Z]/.test(clean)){
+        return clean;
+      }
+    }
+    return extractCandidateNameFromText(text);
+  }
+
+  // Section headers: normalized field name -> known header phrase variants
+  const SECTION_HEADERS = {
+    summary: ["career objective", "summary", "objective", "profile", "professional summary", "about me"],
+    skills: ["technical skills", "skills", "core competencies", "key skills", "skill set", "areas of expertise"],
+    projects: ["projects", "academic projects", "key projects", "personal projects", "project experience"],
+    internships: ["internships", "internship", "training", "industrial training"],
+    experience: ["experience", "work experience", "professional experience", "employment history", "work history"],
+    education: ["education", "academic background", "qualifications", "educational qualifications", "academic qualifications"],
+    certifications: ["certifications", "certificates", "licenses", "licenses & certifications", "courses", "certifications & courses"],
+    languages: ["languages known", "languages"]
+  };
+
+  function normalizeHeaderLine(line){
+    return line.trim().replace(/[:\-–]+$/, "").trim().toLowerCase();
+  }
+
+  function splitSections(text){
+    const lines = text.split("\n");
+    const headerLookup = {};
+    Object.entries(SECTION_HEADERS).forEach(([field, variants]) => {
+      variants.forEach(v => { headerLookup[v] = field; });
+    });
+
+    const matches = [];
+    lines.forEach((line, i) => {
+      const norm = normalizeHeaderLine(line);
+      if (!norm || norm.split(/\s+/).length > 5) return;
+      if (headerLookup[norm]){
+        matches.push([i, headerLookup[norm]]);
+        return;
+      }
+      // Fuzzy match: header phrase appears as the whole content of a short line
+      for (const variant in headerLookup){
+        if (norm === variant || (norm.includes(variant) && norm.length <= variant.length + 15)){
+          matches.push([i, headerLookup[variant]]);
+          return;
+        }
+      }
+    });
+
+    const sections = {};
+    matches.forEach(([lineNo, field], idx) => {
+      const start = lineNo + 1;
+      const end = idx + 1 < matches.length ? matches[idx + 1][0] : lines.length;
+      const sectionText = lines.slice(start, end).join("\n").trim();
+      if (sectionText) sections[field] = sectionText;
+    });
+
+    return sections;
+  }
+
+  function parseListSection(sectionText){
+    if (!sectionText) return [];
+    return sectionText
+      .split(/\n|;|(?<!\d),(?!\d)/)
+      .map(s => s.replace(/^[-•*\s]+/, "").trim())
+      .filter(Boolean);
+  }
+
+  const DEGREE_PATTERN = /\b(B\.?\s?Com|B\.?\s?Tech|B\.?\s?E|B\.?\s?Sc|B\.?\s?A|BCA|BBA|MBA|M\.?\s?Tech|M\.?\s?E|M\.?\s?Sc|M\.?\s?A|MCA|Ph\.?D|Diploma|SSC|HSC|Intermediate|Bachelor(?:'s)?|Master(?:'s)?|Associate)\b[^\n,]*/i;
+  const INSTITUTION_PATTERN = /\b(college|university|institute|school|academy|polytechnic)\b/i;
+
+  function parseEducation(sectionText){
+    if (!sectionText) return [];
+    const entries = [];
+    let current = null;
+
+    sectionText.split("\n").map(l => l.trim()).filter(Boolean).forEach(line => {
+      const yearMatch = line.match(/\b(19|20)\d{2}\b(\s*[-–]\s*(present|(19|20)\d{2}))?/i);
+      const percentMatch = line.match(/\b\d{1,3}(\.\d+)?\s*%/) || line.match(/\b(CGPA|GPA)\s*[:\-]?\s*\d(\.\d+)?/i);
+      const isInstitution = INSTITUTION_PATTERN.test(line);
+      const isDegree = DEGREE_PATTERN.test(line);
+
+      if (isInstitution){
+        if (current) entries.push(current);
+        current = { institution: line.replace(/\b(19|20)\d{2}\b.*$/, "").trim() };
+        if (yearMatch) current.year = yearMatch[0];
+      } else if (isDegree && current && !current.degree){
+        current.degree = line.match(DEGREE_PATTERN)[0].trim();
+      } else if (isDegree && !current){
+        current = { degree: line.match(DEGREE_PATTERN)[0].trim() };
+        if (yearMatch) current.year = yearMatch[0];
+      } else if (percentMatch && current){
+        current.percentage = percentMatch[0];
+      } else if (yearMatch && current && !current.year){
+        current.year = yearMatch[0];
+      } else if (yearMatch && !current){
+        current = { institution: line.replace(yearMatch[0], "").trim(), year: yearMatch[0] };
+      } else if (current && !current.degree && !isInstitution){
+        current.degree = line;
+      }
+    });
+    if (current) entries.push(current);
+    return entries;
+  }
+
+  const LABEL_MAP = {
+    "title": "title", "project title": "title", "project name": "title",
+    "description": "description", "summary": "description",
+    "tech stack": "tech_stack", "technologies": "tech_stack", "tools used": "tech_stack", "stack": "tech_stack",
+    "outcome": "outcome", "result": "outcome", "impact": "outcome"
+  };
+
+  function parseProjects(sectionText){
+    if (!sectionText) return [];
+    const lines = sectionText.split("\n").map(l => l.trim()).filter(Boolean);
+    const isLabeled = lines.some(l => /^[a-z ]+:/i.test(l) && LABEL_MAP[l.split(":")[0].trim().toLowerCase()]);
+
+    if (isLabeled){
+      const projects = [];
+      let current = {};
+      lines.forEach(line => {
+        const colonIdx = line.indexOf(":");
+        const label = colonIdx > -1 ? line.slice(0, colonIdx).trim().toLowerCase() : null;
+        const field = label ? LABEL_MAP[label] : null;
+        if (field){
+          if (field === "title" && Object.keys(current).length){
+            projects.push(current);
+            current = {};
+          }
+          current[field] = line.slice(colonIdx + 1).trim();
+        } else if (Object.keys(current).length){
+          const lastField = Object.keys(current)[Object.keys(current).length - 1];
+          current[lastField] += " " + line.replace(/^[-•*\s]+/, "");
+        }
+      });
+      if (Object.keys(current).length) projects.push(current);
+      return projects;
+    }
+
+    // Fallback: split on blank lines into paragraph blocks
+    const blocks = sectionText.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+    if (blocks.length > 1){
+      return blocks.map(b => {
+        const blines = b.split("\n").map(l => l.trim()).filter(Boolean);
+        return { title: blines[0].replace(/^[-•*\s]+/, ""), description: blines.slice(1).join(" ").replace(/^[-•*\s]+/, "") };
+      });
+    }
+
+    // Fallback: treat each bullet line as its own project note
+    const bulletLines = lines.filter(l => /^[-•*]/.test(l));
+    if (bulletLines.length){
+      return bulletLines.map(l => ({ description: l.replace(/^[-•*\s]+/, "") }));
+    }
+
+    return sectionText.trim() ? [{ description: sectionText.trim() }] : [];
+  }
+
+  const DATE_RANGE_PATTERN = /\b((19|20)\d{2}|[A-Za-z]{3,9}\s+(19|20)\d{2})\s*[-–]\s*(present|current|(19|20)\d{2}|[A-Za-z]{3,9}\s+(19|20)\d{2})\b/i;
+
+  function parseExperience(sectionText){
+    if (!sectionText) return [];
+    const lines = sectionText.split("\n").map(l => l.trim()).filter(Boolean);
+    const entries = [];
+    let current = null;
+
+    lines.forEach(line => {
+      if (DATE_RANGE_PATTERN.test(line)){
+        if (current) entries.push(current);
+        current = { header: line, details: [] };
+      } else if (current){
+        current.details.push(line.replace(/^[-•*\s]+/, ""));
+      } else {
+        current = { header: null, details: [line.replace(/^[-•*\s]+/, "")] };
+      }
+    });
+    if (current) entries.push(current);
+    return entries;
+  }
+
+  function mergeSkills(resumeText, skillsSectionText){
+    const found = findCanonicalSkillsInText(resumeText);
+    parseListSection(skillsSectionText).forEach(item => {
+      const cleaned = item.trim();
+      if (!cleaned || cleaned.length > 40) return;
+      const normalized = cleaned.toLowerCase();
+      if (SKILL_ALIASES[normalized]){
+        found.add(SKILL_ALIASES[normalized]);
+        return;
+      }
+      const alreadyPresent = Array.from(found).some(f => f.toLowerCase() === normalized);
+      if (!alreadyPresent) found.add(cleaned);
+    });
+    return Array.from(found);
+  }
+
+  function extractExperienceRequirement(text){
+    const m = text.match(/(\d+)\+?\s*(?:years|yrs)\b/i);
+    return m ? m[0] : null;
+  }
+
+  // ---------- Scoring ----------
+  const STOPWORDS = new Set(["the","a","an","and","or","to","of","in","for","with","on","is","are","as","at","by","be","this","that","will","we","you","your","our"]);
+
+  // ---------- Unified scoring engine (single source of truth) ----------
+  // ATS Score, Match Score, the gauge, the verdict label, and the matched/
+  // missing skill lists are ALL derived from these same shared inputs
+  // (requiredSkills, matchedSkills, skillRatio, kwScore) so they can never
+  // contradict each other.
+
+  // Keyword/context overlap between the two documents as a whole (0-100).
+  // Used only as a secondary signal — never the sole driver of a "match"
+  // number when skill data is available, since JD prose and resume prose
+  // naturally share little vocabulary even for a strong match.
+  function overlapScore(jdText, resumeText){
+    const tokenize = t => (t.toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !STOPWORDS.has(w));
+    const jdSet = new Set(tokenize(jdText));
+    const resumeSet = new Set(tokenize(resumeText));
+    if (jdSet.size === 0) return 0;
+    let overlap = 0;
+    jdSet.forEach(w => { if (resumeSet.has(w)) overlap++; });
+    return (overlap / jdSet.size) * 100;
+  }
+
+  // ---------- Score band helper (used by Resume Match Score + ATS Score) ----------
+  function getScoreBand(score){
+    if (score >= 90) return { color: "var(--score-excellent)", label: "Excellent Match" };
+    if (score >= 70) return { color: "var(--score-good)", label: "Good Match" };
+    if (score >= 50) return { color: "var(--score-average)", label: "Average Match" };
+    return { color: "var(--score-poor)", label: "Poor Match" };
+  }
+
+  // ATS Compatibility Score. Reuses the SAME requiredSkills/matchedSkills/
+  // skillRatio/kwScore that the Match Score uses for its keyword component,
+  // so the two scores can never disagree about whether skills matched.
+  function computeATSScore(requiredSkills, matchedSkills, skillRatio, kwScore, resumeText, candidate){
+    let score = 0;
+    const reasons = [];
+
+    // Keyword matching (40 pts) — proportional to skillRatio when the JD had
+    // recognizable required skills; otherwise proportional to general
+    // keyword overlap (same signal the Match Score falls back to), instead
+    // of a flat baseline that used to cause ATS/Match Score contradictions.
+    if (requiredSkills.length > 0){
+      score += skillRatio * 40;
+      if (skillRatio >= 0.6){
+        reasons.push({ ok: true, text: "Good keyword matching" });
+      } else {
+        reasons.push({ ok: false, text: "Missing a few required keywords" });
+      }
+    } else {
+      score += (kwScore / 100) * 40;
+      reasons.push({ ok: true, text: "No specific required skills detected in the job description — scored on general keyword overlap" });
+    }
+
+    // Section headings (25 pts)
+    const sectionHeaders = ["experience","education","skills","summary","objective","projects","certifications","internship"];
+    const foundHeaders = sectionHeaders.filter(h => new RegExp("\\b" + h, "i").test(resumeText));
+    const headerRatio = Math.min(foundHeaders.length / 4, 1);
+    score += headerRatio * 25;
+    reasons.push({
+      ok: headerRatio >= 0.75,
+      text: headerRatio >= 0.75 ? "Proper section headings" : "Some standard section headings missing"
+    });
+
+    // Readable formatting / length (20 pts)
+    const wordCount = (resumeText.match(/\S+/g) || []).length;
+    if (wordCount >= 150 && wordCount <= 1200){
+      score += 20;
+      reasons.push({ ok: true, text: "Readable formatting and length" });
+    } else {
+      score += 8;
+      reasons.push({
+        ok: false,
+        text: wordCount < 150 ? "Resume content seems too short for ATS parsing" : "Resume content may be too long for ATS parsing"
+      });
+    }
+
+    // Contact details present (15 pts)
+    let contactScore = 0;
+    if (candidate.email) contactScore += 7;
+    if (candidate.phone) contactScore += 8;
+    score += contactScore;
+    reasons.push({
+      ok: contactScore >= 15,
+      text: contactScore >= 15 ? "Contact details clearly present" : "Missing email or phone number"
+    });
+
+    return { score: Math.round(Math.max(0, Math.min(100, score))), reasons };
+  }
+
+  // Computes the single shared scoring profile used everywhere: Match
+  // Score / gauge / verdict label AND the ATS score are both built from
+  // this one function's outputs, so they cannot contradict each other.
+  function computeSharedScoring(jdText, resumeText, candidate){
+    const requiredSkillSet = findCanonicalSkillsInText(jdText);
+    const resumeSkillSet = findCanonicalSkillsInText(resumeText);
+    const requiredSkills = Array.from(requiredSkillSet);
+    const matchedSkills = requiredSkills.filter(s => resumeSkillSet.has(s));
+    const missingSkills = requiredSkills.filter(s => !resumeSkillSet.has(s));
+
+    const skillRatio = requiredSkills.length > 0 ? matchedSkills.length / requiredSkills.length : null;
+    const kwScore = overlapScore(jdText, resumeText);
+    const lowConfidence = requiredSkills.length === 0;
+
+    const ats = computeATSScore(
+      requiredSkills,
+      matchedSkills,
+      requiredSkills.length > 0 ? skillRatio : 0,
+      kwScore,
+      resumeText,
+      candidate
+    );
+
+    let matchScore;
+    if (requiredSkills.length > 0){
+      matchScore = Math.round(skillRatio * 85 + (kwScore / 100) * 15);
+      // Guarantee: if every required skill was matched (no missing skills),
+      // the Match Score can never land in a low/contradictory band — this
+      // is the exact scenario the scoring must stay consistent for.
+      if (missingSkills.length === 0) matchScore = Math.max(matchScore, 80);
+    } else {
+      // No required skills could be identified in the JD at all, so "fit"
+      // has no skill-based basis to measure. Rather than compute a second,
+      // independent number from raw keyword overlap (which produced the
+      // exact ATS-vs-Match contradiction reported), Match Score simply
+      // equals the ATS score here — one shared number, zero possibility
+      // of disagreement.
+      matchScore = ats.score;
+    }
+    matchScore = Math.max(0, Math.min(100, matchScore));
+
+    return { requiredSkills, matchedSkills, missingSkills, matchScore, ats, lowConfidence };
+  }
+
+  function analyze(jdText, resumeText, nameHint){
+    const candidate = extractContactInfo(resumeText);
+    candidate.name = extractCandidateName(resumeText, nameHint);
+
+    const resumeSections = splitSections(resumeText);
+    candidate.education = parseEducation(resumeSections.education);
+    candidate.educationRaw = resumeSections.education || null;
+    candidate.experience = parseExperience(resumeSections.experience || resumeSections.internships);
+    candidate.experienceRaw = resumeSections.experience || resumeSections.internships || null;
+    candidate.projects = parseProjects(resumeSections.projects);
+    candidate.projectsRaw = resumeSections.projects || null;
+    candidate.certifications = parseListSection(resumeSections.certifications);
+    candidate.certificationsRaw = resumeSections.certifications || null;
+    candidate.skillsFound = mergeSkills(resumeText, resumeSections.skills);
+
+    const shared = computeSharedScoring(jdText, resumeText, candidate);
+    const { requiredSkills, matchedSkills, missingSkills, matchScore, ats, lowConfidence } = shared;
+
+    const role = {
+      title: extractCandidateNameFromText(jdText),
+      experience: extractExperienceRequirement(jdText),
+      requiredSkills
+    };
+
+    return {
+      finalScore: matchScore,
+      lowConfidence,
+      matchedSkills, missingSkills, requiredSkills,
+      candidate, role, ats
+    };
+  }
+
+  // ---------- Rendering ----------
+  // Uses the SAME thresholds as getScoreBand (the circular Match Score ring)
+  // so the verdict stamp and the ring can never show conflicting bands for
+  // the same underlying score.
+  function verdictFor(score){
+    if (score >= 90) return { label: "Strong Fit", cls: "excellent", note: "Candidate covers nearly all of the role's required skills." };
+    if (score >= 70) return { label: "Good Fit", cls: "good", note: "Candidate covers most of the role's required skills." };
+    if (score >= 50) return { label: "Partial Fit", cls: "average", note: "Candidate meets some requirements; review the gaps below." };
+    return { label: "Weak Fit", cls: "poor", note: "Significant gaps between the resume and role requirements." };
+  }
+
+  function renderTags(container, items, cls, emptyLabel){
+    container.innerHTML = "";
+    if (items.length === 0){
+      const span = document.createElement("span");
+      span.className = "tag-empty";
+      span.textContent = emptyLabel;
+      container.appendChild(span);
+      return;
+    }
+    items.forEach(s => {
+      const span = document.createElement("span");
+      span.className = "tag " + cls;
+      span.textContent = (cls === "match" ? "✓ " : "✕ ") + s;
+      container.appendChild(span);
+    });
+  }
+
+  function formatEducation(entries){
+    return entries.map(e => {
+      const parts = [];
+      if (e.degree) parts.push(e.degree);
+      if (e.institution) parts.push(e.institution);
+      if (e.year) parts.push(e.year);
+      if (e.percentage) parts.push(e.percentage);
+      return parts.join(", ");
+    }).filter(Boolean).join("  •  ");
+  }
+
+  function formatExperience(entries){
+    return entries.map(e => {
+      const details = e.details && e.details.length ? e.details.join(" ") : "";
+      if (e.header && details) return e.header + " — " + details;
+      return e.header || details;
+    }).filter(Boolean).join("  •  ");
+  }
+
+  function formatProjects(entries){
+    return entries.map(p => {
+      const parts = [];
+      if (p.title) parts.push(p.title);
+      if (p.description) parts.push(p.description);
+      if (p.tech_stack) parts.push("Tech: " + p.tech_stack);
+      if (p.outcome) parts.push("Outcome: " + p.outcome);
+      return parts.join(" — ");
+    }).filter(Boolean).join("  •  ");
+  }
+
+  // Resolves the display value for a field: prefer structured/formatted data,
+  // fall back to the raw detected section text, and only report "Not found"
+  // when neither exists — i.e. the information truly isn't in the resume.
+  function resolveDisplay(formattedValue, rawSectionText){
+    if (formattedValue && formattedValue.trim()) return formattedValue.trim();
+    if (rawSectionText && rawSectionText.trim()) return rawSectionText.trim().replace(/\s+/g, " ");
+    return null;
+  }
+
+  function ddPair(dl, term, value){
+    const dt = document.createElement("dt");
+    dt.textContent = term;
+    const dd = document.createElement("dd");
+    if (value){
+      dd.textContent = value;
+    } else {
+      dd.textContent = "Not found";
+      dd.className = "empty";
+    }
+    dl.appendChild(dt);
+    dl.appendChild(dd);
+  }
+
+  function renderScoreSummary(result){
+    // Resume Match Score — circular progress ring
+    const band = getScoreBand(result.finalScore);
+    const circumference = 339.3;
+    const offset = circumference * (1 - result.finalScore / 100);
+    const fillCircle = document.getElementById("match-circle-fill");
+    fillCircle.style.stroke = band.color;
+    fillCircle.setAttribute("stroke-dashoffset", offset.toFixed(1));
+    document.getElementById("match-score-num").textContent = result.finalScore;
+    const matchTag = document.getElementById("match-score-tag");
+    matchTag.textContent = band.label;
+    matchTag.style.color = band.color;
+
+    // ATS Compatibility Score — progress bar + reasons
+    const atsBand = getScoreBand(result.ats.score);
+    document.getElementById("ats-score-num").textContent = result.ats.score + "%";
+    const atsFill = document.getElementById("ats-bar-fill");
+    atsFill.style.width = result.ats.score + "%";
+    atsFill.style.background = atsBand.color;
+
+    const reasonsList = document.getElementById("ats-reasons");
+    reasonsList.innerHTML = "";
+    result.ats.reasons.forEach(r => {
+      const li = document.createElement("li");
+      li.className = r.ok ? "ok" : "warn";
+      li.textContent = (r.ok ? "✔ " : "✖ ") + r.text;
+      reasonsList.appendChild(li);
+    });
+  }
+
+  function renderResults(result){
+    document.getElementById("dossier-empty").style.display = "none";
+    document.getElementById("dossier-results").style.display = "block";
+
+    renderScoreSummary(result);
+
+    document.getElementById("gauge-score-num").textContent = result.finalScore;
+    const angle = 180 - (result.finalScore / 100) * 180;
+    const rad = angle * Math.PI / 180;
+    const x2 = 100 + 70 * Math.cos(rad);
+    const y2 = 110 - 70 * Math.sin(rad);
+    const needle = document.getElementById("gauge-needle");
+    needle.setAttribute("x2", x2.toFixed(1));
+    needle.setAttribute("y2", y2.toFixed(1));
+
+    const v = verdictFor(result.finalScore);
+    const stamp = document.getElementById("verdict-stamp");
+    stamp.textContent = v.label;
+    stamp.className = "stamp " + v.cls;
+    // restart animation
+    stamp.style.animation = "none";
+    void stamp.offsetWidth;
+    stamp.style.animation = "";
+    document.getElementById("verdict-sub").textContent = v.note +
+      (result.lowConfidence ? " (No specific required skills were detected in the job description — this score is based on general keyword overlap only.)" : "");
+
+    renderTags(document.getElementById("matched-tags"), result.matchedSkills, "match",
+      result.lowConfidence ? "No specific required skills detected in the job description." : "No required skills matched.");
+    renderTags(document.getElementById("missing-tags"), result.missingSkills, "missing",
+      result.lowConfidence ? "No specific required skills detected in the job description." : "No skill gaps detected.");
+
+    const candSheet = document.getElementById("candidate-sheet");
+    candSheet.innerHTML = "";
+    ddPair(candSheet, "Name", result.candidate.name);
+    ddPair(candSheet, "Email", result.candidate.email);
+    ddPair(candSheet, "Phone", result.candidate.phone);
+    ddPair(candSheet, "LinkedIn", result.candidate.linkedin);
+    ddPair(candSheet, "GitHub", result.candidate.github);
+    ddPair(candSheet, "Education", resolveDisplay(formatEducation(result.candidate.education), result.candidate.educationRaw));
+    ddPair(candSheet, "Experience", resolveDisplay(formatExperience(result.candidate.experience), result.candidate.experienceRaw));
+    ddPair(candSheet, "Projects", resolveDisplay(formatProjects(result.candidate.projects), result.candidate.projectsRaw));
+    ddPair(candSheet, "Certifications", resolveDisplay(result.candidate.certifications.join("  •  "), result.candidate.certificationsRaw));
+    ddPair(candSheet, "Skills Detected", result.candidate.skillsFound.length ? result.candidate.skillsFound.join(", ") : null);
+
+    const roleSheet = document.getElementById("role-sheet");
+    roleSheet.innerHTML = "";
+    ddPair(roleSheet, "Role / Title Line", result.role.title);
+    ddPair(roleSheet, "Experience Required", result.role.experience);
+    ddPair(roleSheet, "Required Skills Found", result.role.requiredSkills.length ? result.role.requiredSkills.join(", ") : null);
+  }
+
+  // ---------- PDF Report Generation ----------
+  function generatePDFReport(result){
+    if (!window.jspdf || !window.jspdf.jsPDF){
+      alert("PDF library failed to load. Check your internet connection and try again.");
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+    const margin = 16;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const maxWidth = pageWidth - margin * 2;
+    let y = 20;
+
+    function checkPageBreak(needed){
+      if (y + needed > pageHeight - margin){
+        doc.addPage();
+        y = 20;
+      }
+    }
+
+    function addHeading(text){
+      checkPageBreak(14);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(38, 32, 26);
+      doc.text(text, margin, y);
+      y += 6;
+      doc.setDrawColor(201, 183, 142);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, margin + maxWidth, y);
+      y += 6;
+    }
+
+    function addLine(label, value){
+      checkPageBreak(8);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(60, 50, 40);
+      const labelText = label + ": ";
+      doc.text(labelText, margin, y);
+      const labelWidth = doc.getTextWidth(labelText) + 1;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(30, 25, 20);
+      const lines = doc.splitTextToSize(value || "Not found", maxWidth - labelWidth);
+      doc.text(lines, margin + labelWidth, y);
+      y += lines.length * 5 + 2;
+    }
+
+    function addParagraph(text){
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(30, 25, 20);
+      const lines = doc.splitTextToSize(text || "Not found", maxWidth);
+      lines.forEach(line => {
+        checkPageBreak(6);
+        doc.text(line, margin, y);
+        y += 5;
+      });
+      y += 4;
+    }
+
+    // ----- Title block -----
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(19);
+    doc.setTextColor(20, 15, 10);
+    doc.text("ScreenDesk - Resume Fit Report", margin, y);
+    y += 8;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(110, 100, 85);
+    doc.text("Generated on " + new Date().toLocaleString(), margin, y);
+    y += 10;
+
+    // ----- Scores -----
+    const v = verdictFor(result.finalScore);
+    addHeading("Scores & Fit Status");
+    addLine("Resume Match Score", result.finalScore + "%");
+    addLine("ATS Compatibility Score", result.ats.score + "%");
+    addLine("Fit Status", v.label);
+    if (result.lowConfidence){
+      addParagraph("Note: no specific required skills were detected in the job description, so this score is based on general keyword overlap only.");
+    }
+
+    // ----- Candidate details -----
+    addHeading("Candidate Details");
+    addLine("Full Name", result.candidate.name);
+    addLine("Email", result.candidate.email);
+    addLine("Phone Number", result.candidate.phone);
+    addLine("LinkedIn", result.candidate.linkedin);
+    addLine("GitHub", result.candidate.github);
+
+    // ----- Education -----
+    addHeading("Education");
+    addParagraph(resolveDisplay(formatEducation(result.candidate.education), result.candidate.educationRaw));
+
+    // ----- Experience -----
+    addHeading("Experience");
+    addParagraph(resolveDisplay(formatExperience(result.candidate.experience), result.candidate.experienceRaw));
+
+    // ----- Projects -----
+    addHeading("Projects");
+    addParagraph(resolveDisplay(formatProjects(result.candidate.projects), result.candidate.projectsRaw));
+
+    // ----- Certifications -----
+    addHeading("Certifications");
+    addParagraph(resolveDisplay(result.candidate.certifications.join("; "), result.candidate.certificationsRaw));
+
+    // ----- Skills Detected -----
+    addHeading("Technical Skills Detected");
+    addParagraph(result.candidate.skillsFound.length ? result.candidate.skillsFound.join(", ") : "Not found");
+
+    // ----- Skills Analysis -----
+    addHeading("Skills Analysis");
+    addParagraph("Matched Skills: " + (result.matchedSkills.length ? result.matchedSkills.join(", ") : "None"));
+    addParagraph("Missing Skills: " + (result.missingSkills.length ? result.missingSkills.join(", ") : "None"));
+
+    // ----- Job Requirements -----
+    addHeading("Job Requirements");
+    addLine("Role / Title Line", result.role.title);
+    addLine("Experience Required", result.role.experience);
+    addParagraph("Required Skills: " + (result.role.requiredSkills.length ? result.role.requiredSkills.join(", ") : "None detected"));
+
+    // ----- Final Recommendation -----
+    addHeading("Final Recommendation");
+    addParagraph(v.note);
+
+    // Build the PDF as a Blob and trigger the download manually via a
+    // hidden anchor element. This avoids jsPDF's built-in save(), which in
+    // some sandboxed/embedded environments falls back to window.open() or
+    // an embedded viewer — exactly what must be avoided here. A Blob URL
+    // downloaded through a temporary <a download> link never opens a
+    // viewer, iframe, or new tab; it just saves the file.
+    try {
+      const pdfBlob = doc.output("blob");
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "Resume_Fit_Report.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+    } catch (err){
+      alert("Could not generate the PDF: " + err.message);
+    }
+  }
+
+  // ---------- Wiring ----------
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-input");
+  const chipWrap = document.getElementById("file-chip-wrap");
+  const resumeText = document.getElementById("resume-text");
+  const jdText = document.getElementById("jd-text");
+  const statusLine = document.getElementById("status-line");
+  const analyzeBtn = document.getElementById("analyze-btn");
+const demoBtn = document.getElementById("demo-btn");
+const clearBtn = document.getElementById("clear-btn");
+const downloadPdfBtn = document.getElementById("download-pdf-btn");
+  const clearBtn = document.getElementById("clear-btn");
+  const downloadPdfBtn = document.getElementById("download-pdf-btn");
+  let lastAnalysisResult = null;
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
+  dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("dragover"); });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+  });
+
+  let detectedNameHint = null;
+  resumeText.addEventListener("input", () => { detectedNameHint = null; });
+
+  async function handleFile(file){
+    chipWrap.innerHTML = `<span class="file-chip">📄 ${file.name}</span>`;
+    statusLine.textContent = "Reading " + file.name + " ...";
+    try{
+      const result = await readResumeFile(file);
+      resumeText.value = cleanExtractedText(result.text);
+      detectedNameHint = result.nameHint || null;
+      statusLine.textContent = "Loaded " + file.name + " (" + resumeText.value.length + " characters).";
+    } catch(err){
+      statusLine.textContent = "Could not read file: " + err.message;
+    }
+  }
+demoBtn.addEventListener("click", () => {
+    jdText.value = `We are looking for a Data Analyst with skills in SQL, Excel, Power BI, Python, data visualization, and communication.`;
+
+   resumeText.value = `Uyyala Siddardha
+B.Com (Computer Applications)
+
+Skills:
+- Microsoft Excel
+- Power BI
+- SQL
+- Python
+- Data Analysis
+- Communication
+- Problem Solving
+
+Projects:
+- Sales Dashboard using Power BI
+- AI Resume Screening Tool
+- Student Attendance Report
+
+Education:
+B.Com (Computer Applications)`;
+
+    statusLine.textContent = "Sample data loaded. Click Analyze Fit.";
+});
+  analyzeBtn.addEventListener("click", () => {
+    const jd = jdText.value.trim();
+    const resume = resumeText.value.trim();
+    if (!jd || !resume){
+      statusLine.textContent = "Add both a job description and a resume before analyzing.";
+      return;
+    }
+    statusLine.textContent = "Analysis complete.";
+    const result = analyze(jd, resume, detectedNameHint);
+    lastAnalysisResult = result;
+    renderResults(result);
+  });
+
+  // Fully resets the application to its initial state without a page reload:
+  // clears both inputs, the uploaded file, the detected name hint, and every
+  // rendered score/tag/field in the Fit Report, then hides the report again.
+  clearBtn.addEventListener("click", () => {
+    jdText.value = "";
+    resumeText.value = "";
+    fileInput.value = "";
+    chipWrap.innerHTML = "";
+    detectedNameHint = null;
+    lastAnalysisResult = null;
+    statusLine.textContent = "";
+
+    document.getElementById("matched-tags").innerHTML = "";
+    document.getElementById("missing-tags").innerHTML = "";
+    document.getElementById("candidate-sheet").innerHTML = "";
+    document.getElementById("role-sheet").innerHTML = "";
+    document.getElementById("ats-reasons").innerHTML = "";
+    document.getElementById("gauge-score-num").textContent = "0";
+    document.getElementById("match-score-num").textContent = "0";
+    const matchTag = document.getElementById("match-score-tag");
+    matchTag.textContent = "—";
+    matchTag.style.color = "";
+    document.getElementById("ats-score-num").textContent = "0%";
+    document.getElementById("ats-bar-fill").style.width = "0%";
+    document.getElementById("ats-bar-fill").style.background = "";
+    const needle = document.getElementById("gauge-needle");
+    needle.setAttribute("x2", "30");
+    needle.setAttribute("y2", "110");
+    document.getElementById("match-circle-fill").setAttribute("stroke-dashoffset", "339.3");
+    const stamp = document.getElementById("verdict-stamp");
+    stamp.textContent = "—";
+    stamp.className = "stamp";
+    document.getElementById("verdict-sub").textContent = "";
+
+    document.getElementById("dossier-results").style.display = "none";
+    document.getElementById("dossier-empty").style.display = "flex";
+
+    jdText.focus();
+  });
+
+  downloadPdfBtn.addEventListener("click", () => {
+    if (!lastAnalysisResult){
+      statusLine.textContent = "Run an analysis first before downloading the report.";
+      return;
+    }
+    generatePDFReport(lastAnalysisResult);
+  });
+</script>
+</body>
+</html>
