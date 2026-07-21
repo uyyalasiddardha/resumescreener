@@ -499,9 +499,10 @@
       <textarea id="resume-text" placeholder="...or paste resume text directly here."></textarea>
 
       <div class="button-row">
-        <button class="analyze-btn" id="analyze-btn">Analyze Fit</button>
-        <button class="clear-btn" id="clear-btn" type="button">Clear</button>
-      </div>
+    <button class="clear-btn" id="demo-btn" type="button"> Try Demo</button>
+    <button class="analyze-btn" id="analyze-btn">Analyze Fit</button>
+    <button class="clear-btn" id="clear-btn" type="button">Clear</button>
+</div>
       <div class="status-line" id="status-line"></div>
     </div>
 
@@ -1619,8 +1620,9 @@
   const jdText = document.getElementById("jd-text");
   const statusLine = document.getElementById("status-line");
   const analyzeBtn = document.getElementById("analyze-btn");
-  const clearBtn = document.getElementById("clear-btn");
-  const downloadPdfBtn = document.getElementById("download-pdf-btn");
+const demoBtn = document.getElementById("demo-btn");
+const clearBtn = document.getElementById("clear-btn");
+const downloadPdfBtn = document.getElementById("download-pdf-btn");
   let lastAnalysisResult = null;
 
   dropzone.addEventListener("click", () => fileInput.click());
@@ -1651,7 +1653,31 @@
       statusLine.textContent = "Could not read file: " + err.message;
     }
   }
+demoBtn.addEventListener("click", () => {
+    jdText.value = `We are looking for a Data Analyst with skills in SQL, Excel, Power BI, Python, data visualization, and communication.`;
 
+   resumeText.value = `Uyyala Siddardha
+B.Com (Computer Applications)
+
+Skills:
+- Microsoft Excel
+- Power BI
+- SQL
+- Python
+- Data Analysis
+- Communication
+- Problem Solving
+
+Projects:
+- Sales Dashboard using Power BI
+- AI Resume Screening Tool
+- Student Attendance Report
+
+Education:
+B.Com (Computer Applications)`;
+
+    statusLine.textContent = "Sample data loaded. Click Analyze Fit.";
+});
   analyzeBtn.addEventListener("click", () => {
     const jd = jdText.value.trim();
     const resume = resumeText.value.trim();
