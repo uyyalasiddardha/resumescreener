@@ -1688,16 +1688,22 @@ B.Com (Computer Applications)`;
     statusLine.textContent = "Sample data loaded. Click Analyze Fit.";
 });
   analyzeBtn.addEventListener("click", () => {
+    analyzeBtn.textContent = "Analyzing...";
+analyzeBtn.disabled = true;
     const jd = jdText.value.trim();
     const resume = resumeText.value.trim();
     if (!jd || !resume){
       statusLine.textContent = "Add both a job description and a resume before analyzing.";
+      analyzeBtn.textContent = "Analyze Fit";
+analyzeBtn.disabled = false;
       return;
     }
     statusLine.textContent = "Analysis complete.";
     const result = analyze(jd, resume, detectedNameHint);
     lastAnalysisResult = result;
     renderResults(result);
+    analyzeBtn.textContent = "Analyze Fit";
+analyzeBtn.disabled = false;
   });
 
   // Fully resets the application to its initial state without a page reload:
