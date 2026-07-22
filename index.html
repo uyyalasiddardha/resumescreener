@@ -246,6 +246,8 @@
   .download-btn:active{ transform: scale(0.98); }
 
   .status-line{
+  transition: all 0.3s ease;
+font-weight: 600;
     font-family: var(--font-mono);
     font-size: 11.5px;
     color: var(--ink-soft);
@@ -1700,6 +1702,7 @@ B.Com (Computer Applications)`;
     analyzeBtn.disabled = false;
     return;
   }
+statusLine.style.color = "#3B6EA5";
 statusLine.textContent = "🤖 AI is analyzing your resume...";
   
   setTimeout(() => {
@@ -1707,6 +1710,7 @@ statusLine.textContent = "🤖 AI is analyzing your resume...";
     lastAnalysisResult = result;
     renderResults(result);
 
+    statusLine.style.color = "#3E8A5D";
     statusLine.textContent = "Analysis complete.";
     analyzeBtn.textContent = "Analyze Fit";
     analyzeBtn.disabled = false;
