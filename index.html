@@ -1700,8 +1700,8 @@ B.Com (Computer Applications)`;
     analyzeBtn.disabled = false;
     return;
   }
-
-  alert("Waiting 5 seconds...");
+statusLine.textContent = "Analyzing resume...";
+  
   setTimeout(() => {
     const result = analyze(jd, resume, detectedNameHint);
     lastAnalysisResult = result;
