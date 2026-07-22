@@ -1710,7 +1710,7 @@ statusLine.textContent = "🤖 AI is analyzing your resume...";
     lastAnalysisResult = result;
     renderResults(result);
 
-    statusLine.style.color = "#3E8A5D";
+    statusLine.style.setProperty("color", "#3E8A5D", "important");
     statusLine.textContent = "Analysis complete.";
     analyzeBtn.textContent = "Analyze Fit";
     analyzeBtn.disabled = false;
