@@ -54,7 +54,7 @@
     min-height:100vh;
   }
 
-  .app{ max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  .app{ max-width: 1500px; width: 100%; margin: 0 auto; padding: 40px 24px 80px; }
 
   /* ---------- Masthead ---------- */
   .masthead{
@@ -82,10 +82,17 @@
   /* ---------- Layout ---------- */
   .grid{
     display:grid;
-    grid-template-columns: 1fr 1.15fr;
+    grid-template-columns: 0.75fr 1.25fr;
     gap: 24px;
     align-items: start;
   }
+  .grid > .panel{
+    order: 1;
+}
+
+.grid > div{
+    order: 2;
+}
   @media (max-width: 880px){
     .grid{ grid-template-columns: 1fr; }
   }
@@ -107,7 +114,29 @@
     pointer-events:none;
     opacity: 0.6;
   }
+.live-dashboard{
+    margin-top:20px;
+}
 
+.live-card{
+    background:#fafafa;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    color:#222;
+}
+
+.live-card h3,
+.live-card h4{
+    margin:0 0 10px;
+    color:#222;
+}
+
+.live-card p{
+    margin:6px 0;
+    color:#333;
+}
   .panel-label{
     font-family: var(--font-mono);
     font-size: 11px;
@@ -538,6 +567,7 @@ font-weight: 600;
       <div class="status-line" id="status-line">Ready to analyze.</div>
     </div>
 
+
     <!-- DOSSIER / RESULTS PANEL -->
     <div class="panel" id="results-panel">
       <p class="panel-label">Dossier</p>
@@ -622,7 +652,15 @@ font-weight: 600;
         <p class="subhead">Role Requirements Detected</p>
         <dl class="data-sheet" id="role-sheet"></dl>
 <hr class="section-divider">
+<div class="panel-section">
+  <h3>📋 Resume Readiness</h3>
 
+  <div class="suggestion-box">
+    <ul id="readiness-list">
+      <li>Analyze a resume to view readiness.</li>
+    </ul>
+  </div>
+</div>
 <div class="panel-section" id="ai-suggestions">
   <h3>💡 AI Resume Suggestions</h3>
 
@@ -647,12 +685,49 @@ font-weight: 600;
     </ul>
   </div>
 </div>
+<hr class="section-divider">
+
+<div class="panel-section">
+    <h3>📋 Resume Section Analysis</h3>
+
+    <div class="suggestion-box">
+        <ul id="section-analysis">
+            <li>Analyze a resume to view section analysis.</li>
+        </ul>
+    </div>
+</div>
         <button class="download-btn" id="download-pdf-btn" type="button">Download PDF Report</button>
 
       </div>
     </div>
 
-  </div>
+  <div class="live-dashboard">
+
+    <div class="live-card">
+        <h3>🤖 ScreenDesk AI</h3>
+        <p id="ai-status">Waiting for analysis...</p>
+    </div>
+
+    <div class="live-card">
+        <h4>📊 Live Statistics</h4>
+
+        <p>🎯 ATS Score: <b id="live-score">--</b></p>
+        <p>🧠 Skills: <b id="live-skills">--</b></p>
+        <p>📁 Projects: <b id="live-projects">--</b></p>
+        <p>🏆 Certificates: <b id="live-certificates">--</b></p>
+        <p>💼 Best Role: <b id="live-role">--</b></p>
+    </div>
+
+    <div class="live-card">
+        <h4>⚡ AI Progress</h4>
+
+        <p>✔ Resume Parsed</p>
+        <p>✔ Skills Extracted</p>
+        <p>✔ ATS Checked</p>
+        <p>✔ AI Suggestions Ready</p>
+    </div>
+
+</div></div>
 
   <p class="privacy-note">No files are uploaded to a server — parsing and scoring happen locally in this browser tab.</p>
 
@@ -1468,13 +1543,102 @@ font-weight: 600;
       reasonsList.appendChild(li);
     });
   }
+function generateAISuggestions(result) {
 
+    const strengths = [];
+    const improvements = [];
+    const nextSteps = [];
+
+    if (result.matchedSkills.length >= 5) {
+        strengths.push("Your resume contains most of the required technical skills.");
+    }
+
+    if (result.ats.score >= 80) {
+        strengths.push("Your resume is ATS-friendly.");
+    }
+
+    if (result.missingSkills.length > 0) {
+        improvements.push(
+            "Add these missing skills: " +
+            result.missingSkills.join(", ")
+        );
+    }
+
+    if (!result.candidate.projects.length) {
+        improvements.push("Add at least 2 strong projects.");
+    }
+
+    if (!result.candidate.certifications.length) {
+        improvements.push("Add relevant certifications.");
+    }
+
+    nextSteps.push("Customize your resume for every job application.");
+    nextSteps.push("Quantify achievements with numbers.");
+    nextSteps.push("Update LinkedIn profile to match your resume.");
+if (strengths.length === 0) {
+    strengths.push("Your resume matches some of the job requirements.");
+}
+let career = "General Professional";
+
+if (result.matchedSkills.includes("Power BI") || result.matchedSkills.includes("Excel")) {
+    career = "Data Analyst";
+}
+
+if (result.matchedSkills.includes("JavaScript") || result.matchedSkills.includes("HTML")) {
+    career = "Frontend Developer";
+}
+
+if (result.matchedSkills.includes("Python") && result.matchedSkills.includes("SQL")) {
+    career = "Data Scientist";
+}
+
+nextSteps.unshift("Recommended Career Path: " + career);
+    return {
+        strengths,
+        improvements,
+        nextSteps
+    };
+}
   function renderResults(result){
     document.getElementById("dossier-empty").style.display = "none";
     document.getElementById("dossier-results").style.display = "block";
 
     renderScoreSummary(result);
+    document.getElementById("ai-status").textContent = "Analysis Complete";
+document.getElementById("live-score").textContent = result.finalScore + "%";
+document.getElementById("live-skills").textContent = result.candidate.skillsFound.length;
+document.getElementById("live-projects").textContent = result.candidate.projects.length;
+document.getElementById("live-certificates").textContent = result.candidate.certifications.length;
+document.getElementById("live-role").textContent = result.recommendedRole || "General";
+    const ai = generateAISuggestions(result);
 
+document.getElementById("strength-list").innerHTML =
+    ai.strengths.map(s => `<li>${s}</li>`).join("");
+
+document.getElementById("improvement-list").innerHTML =
+    ai.improvements.map(s => `<li>${s}</li>`).join("");
+
+document.getElementById("nextstep-list").innerHTML =
+    ai.nextSteps.map(s => `<li>${s}</li>`).join("");
+    const readiness = document.getElementById("readiness-list");
+
+if (readiness) {
+  readiness.innerHTML = `
+    <li>${result.finalScore >= 80 ? "✅ ATS Ready" : "⚠️ ATS Needs Improvement"}</li>
+    <li>${result.candidate.name ? "✅ Name Found" : "❌ Name Missing"}</li>
+    <li>${result.candidate.email ? "✅ Email Found" : "❌ Email Missing"}</li>
+    <li>${result.candidate.projects.length ? "✅ Projects Added" : "❌ No Projects"}</li>
+    <li>${result.candidate.certifications.length ? "✅ Certifications Added" : "❌ No Certifications"}</li>
+  `;
+}
+document.getElementById("section-analysis").innerHTML = `
+<li>👤 Name: ${result.candidate.name || "Not Found"}</li>
+<li>🎓 Education: ${result.candidate.education ? "✅ Found" : "❌ Missing"}</li>
+<li>💼 Experience: ${result.candidate.experience.length ? "✅ Found" : "❌ Missing"}</li>
+<li>🛠 Skills: ${result.candidate.skillsFound.length} Found</li>
+<li>📜 Certifications: ${result.candidate.certifications.length}</li>
+<li>📂 Projects: ${result.candidate.projects.length}</li>
+`;
     document.getElementById("gauge-score-num").textContent = result.finalScore;
     const angle = 180 - (result.finalScore / 100) * 180;
     const rad = angle * Math.PI / 180;
@@ -1769,7 +1933,7 @@ statusLine.textContent = "🤖 AI is analyzing your resume...";
     statusLine.textContent = "Analysis complete.";
     analyzeBtn.textContent = "Analyze Fit";
     analyzeBtn.disabled = false;
-  }, 5000);
+  }, 3000);
 });
 
   // Fully resets the application to its initial state without a page reload:
