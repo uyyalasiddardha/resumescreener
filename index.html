@@ -82,17 +82,11 @@
   /* ---------- Layout ---------- */
   .grid{
     display:grid;
-    grid-template-columns: 0.75fr 1.25fr;
+    grid-template-columns: 420px 1fr;
     gap: 24px;
     align-items: start;
   }
-  .grid > .panel{
-    order: 1;
-}
-
-.grid > div{
-    order: 2;
-}
+  
   @media (max-width: 880px){
     .grid{ grid-template-columns: 1fr; }
   }
@@ -116,6 +110,9 @@
   }
 .live-dashboard{
     margin-top:20px;
+    position: sticky;
+    top: 20px;
+    align-self: start;
 }
 
 .live-card{
@@ -566,7 +563,31 @@ font-weight: 600;
 </div>
       <div class="status-line" id="status-line">Ready to analyze.</div>
     </div>
+<div class="live-dashboard">
 
+    <div class="live-card">
+        <h3>🤖 ScreenDesk AI</h3>
+        <p id="ai-status">Waiting for analysis...</p>
+    </div>
+
+    <div class="live-card">
+        <h4>📊 Live Statistics</h4>
+
+        <p>🎯 ATS Score: <b id="live-score">--</b></p>
+        <p>🧠 Skills: <b id="live-skills">--</b></p>
+        <p>📁 Projects: <b id="live-projects">--</b></p>
+        <p>🏆 Certificates: <b id="live-certificates">--</b></p>
+        <p>💼 Best Role: <b id="live-role">--</b></p>
+    </div>
+
+    <div class="live-card">
+        <h4>⚡ AI Progress</h4>
+
+        <p>✔ Resume Parsed</p>
+        <p>✔ Skills Extracted</p>
+        <p>✔ ATS Checked</p>
+        <p>✔ AI Suggestions Ready</p>
+    </div>
 
     <!-- DOSSIER / RESULTS PANEL -->
     <div class="panel" id="results-panel">
@@ -699,33 +720,8 @@ font-weight: 600;
         <button class="download-btn" id="download-pdf-btn" type="button">Download PDF Report</button>
 
       </div>
-    </div>
 
-  <div class="live-dashboard">
-
-    <div class="live-card">
-        <h3>🤖 ScreenDesk AI</h3>
-        <p id="ai-status">Waiting for analysis...</p>
-    </div>
-
-    <div class="live-card">
-        <h4>📊 Live Statistics</h4>
-
-        <p>🎯 ATS Score: <b id="live-score">--</b></p>
-        <p>🧠 Skills: <b id="live-skills">--</b></p>
-        <p>📁 Projects: <b id="live-projects">--</b></p>
-        <p>🏆 Certificates: <b id="live-certificates">--</b></p>
-        <p>💼 Best Role: <b id="live-role">--</b></p>
-    </div>
-
-    <div class="live-card">
-        <h4>⚡ AI Progress</h4>
-
-        <p>✔ Resume Parsed</p>
-        <p>✔ Skills Extracted</p>
-        <p>✔ ATS Checked</p>
-        <p>✔ AI Suggestions Ready</p>
-    </div>
+  
 
 </div></div>
 
