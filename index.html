@@ -518,9 +518,81 @@ font-weight: 600;
     .needle{ transition: none !important; }
     .match-circle-fill, .ats-bar-fill{ transition: none !important; }
   }
+.page-navigation {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0 28px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  padding: 13px 20px;
+  border: 1px solid #d9a548;
+  border-radius: 10px;
+  background: transparent;
+  color: #d9a548;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  background: #d9a548;
+  color: #17191f;
+}
+</style>
+<style>
+  .app {
+  display: none;
+}
 </style>
 </head>
 <body>
+  <div id="auth-screen" style="display:flex;min-height:100vh;align-items:center;justify-content:center;background:#101114;color:#fff;font-family:Arial,sans-serif;padding:24px;box-sizing:border-box">
+  <div style="width:100%;max-width:420px;background:#1b1c20;border:1px solid #39352b;border-radius:20px;padding:32px;box-sizing:border-box">
+    <h1 style="color:#D9A548;margin:0 0 8px">ScreenDesk AI</h1>
+    <p style="color:#aaa;margin-bottom:28px">AI-powered resume screening</p>
+
+    <div style="display:none;gap:10px;margin-bottom:22px">
+      <button id="login-tab" type="button">Login</button>
+      <button id="signup-tab" type="button">Sign up</button>
+    </div>
+
+    <form id="auth-form">
+      <label for="auth-name" id="name-label" style="display:none">Full name</label>
+      <input id="auth-name" autocomplete="name" placeholder="Full name"
+        style="display:none;width:100%;padding:13px;margin:8px 0;border-radius:8px;box-sizing:border-box">
+
+      <label for="auth-email">Email address</label>
+      <input id="auth-email" type="email" autocomplete="email" required
+        placeholder="you@example.com"
+        style="width:100%;padding:13px;margin:8px 0 16px;border-radius:8px;box-sizing:border-box">
+
+      <label for="auth-password">Password</label>
+      <input id="auth-password" type="password" autocomplete="current-password"
+        minlength="8" required placeholder="At least 8 characters"
+        style="width:100%;padding:13px;margin:8px 0 20px;border-radius:8px;box-sizing:border-box">
+
+      <button id="auth-submit" type="submit"
+        style="width:100%;padding:14px;background:#D9A548;color:#17191f;border:0;border-radius:8px;font-weight:bold;cursor:pointer">
+        Login
+      </button>
+      <p style="text-align:center;margin-top:14px;color:#ddd">
+  Don't have an account?
+  <button
+    type="button"
+    id="auth-toggle"
+    style="background:none;border:none;color:#D9A548;cursor:pointer">
+    Sign Up
+  </button>
+</p>
+
+<p id="auth-message" role="status"
+   style="color:#ddd;line-height:1.5"></p>
+    </form>
+  </div>
+</div>
 <div class="app">
 
   <div class="masthead">
@@ -534,8 +606,17 @@ font-weight: 600;
       <p>AI-POWERED RESUME SCREENING & ATS ANALYSIS</p>
     </div>
   </div>
+<!-- ScreenDesk Navigation -->
+<div class="page-navigation">
+  <button id="single-page-btn" class="nav-btn active" type="button">
+    👤 Single Resume Screening
+  </button>
 
-  <div class="grid">
+  <button id="bulk-page-btn" class="nav-btn" type="button">
+    👥 Bulk Resume Screening
+  </button>
+</div>
+  <div class="grid" id="single-screening">
 
     <!-- INTAKE PANEL -->
     <div class="panel">
@@ -578,7 +659,12 @@ font-weight: 600;
         <p>📁 Projects: <b id="live-projects">--</b></p>
         <p>🏆 Certificates: <b id="live-certificates">--</b></p>
         <p>💼 Best Role: <b id="live-role">--</b></p>
-    </div>
+    <p>👥 Total Candidates: <b id="live-candidates">--</b></p>
+<p>🏆 Shortlisted: <b id="live-shortlisted">--</b></p>
+<p>📊 Average Match: <b id="live-average">--</b></p>
+<p>🧩 Top Matching Skills: <b id="live-top-skills">--</b></p>
+<p>⚠️ Common Skill Gaps: <b id="live-skill-gaps">--</b></p>
+      </div>
 
     <div class="live-card">
         <h4>⚡ AI Progress</h4>
@@ -723,9 +809,64 @@ font-weight: 600;
 
   
 
-</div></div>
+</div></div></div>
 
-  <p class="privacy-note">No files are uploaded to a server — parsing and scoring happen locally in this browser tab.</p>
+<!-- ScreenDesk 2.0: Bulk Resume Screening -->
+<section id="bulk-screening" class="panel" style="display: none; margin: 28px 0;">
+  <p class="panel-label">ScreenDesk 2.0</p>
+  <h2 class="panel-title">Bulk Resume Screening</h2>
+  <p>Compare up to 25 resumes against one job description.</p>
+
+  <label for="bulk-jd" class="field-label">Job Description</label>
+  <textarea id="bulk-jd" placeholder="Paste the job description here..."></textarea>
+
+  <label for="bulk-files" class="field-label">Upload Resumes (PDF, DOCX, TXT)</label>
+  <input id="bulk-files" type="file" accept=".pdf,.docx,.txt" multiple>
+
+  <p id="bulk-file-count" class="status-line">Select up to 25 resumes.</p>
+
+  <div class="button-row">
+    <button id="bulk-analyze-btn" class="analyze-btn" type="button">Screen Resumes</button>
+    <button id="bulk-clear-btn" class="clear-btn" type="button">Clear</button>
+  </div>
+
+  <p id="bulk-status" class="status-line" role="status">Ready to screen candidates.</p>
+
+  <div id="bulk-results" style="display:none; margin-top:24px;">
+    <!-- Bulk Screening Dashboard -->
+<div id="bulk-dashboard" style="display:none; margin-bottom:20px;">
+
+    <h3>📊 Bulk Screening Dashboard</h3>
+
+    <p>Total Candidates:
+        <strong id="bulk-total-candidates">0</strong>
+    </p>
+
+    <p>Shortlisted Candidates:
+        <strong id="bulk-shortlisted">0</strong>
+    </p>
+
+    <p>Average Match Score:
+        <strong id="bulk-average">0%</strong>
+    </p>
+
+    <p>Top Matching Skills:
+        <strong id="bulk-top-skills">Not available</strong>
+    </p>
+
+    <p>Common Skill Gaps:
+        <strong id="bulk-skill-gaps">Not available</strong>
+    </p>
+
+</div>
+    <h3>Candidate Rankings</h3>
+    <p id="bulk-summary"></p>
+    <button id="bulk-csv-btn" class="download-btn" type="button">Download CSV</button>
+    <div id="bulk-candidate-list"></div>
+  </div>
+</section>
+<!-- End Bulk Resume Screening --> 
+<p class="privacy-note">No files are uploaded to a server — parsing and scoring happen locally in this browser tab.</p>
 
 </div>
 
@@ -1979,6 +2120,372 @@ statusLine.textContent = "🤖 AI is analyzing your resume...";
     }
     generatePDFReport(lastAnalysisResult);
   });
+/* ScreenDesk 2.0 — Bulk Resume Screening */
+(() => {
+  const fileInput = document.getElementById("bulk-files");
+  const jdInput = document.getElementById("bulk-jd");
+  const countLabel = document.getElementById("bulk-file-count");
+  const status = document.getElementById("bulk-status");
+  const resultsBox = document.getElementById("bulk-results");
+  const summary = document.getElementById("bulk-summary");
+  const candidateList = document.getElementById("bulk-candidate-list");
+  const screenBtn = document.getElementById("bulk-analyze-btn");
+  const clearBtn = document.getElementById("bulk-clear-btn");
+  const csvBtn = document.getElementById("bulk-csv-btn");
+
+  let candidates = [];
+
+  fileInput.addEventListener("change", () => {
+    const files = Array.from(fileInput.files || []);
+    countLabel.textContent = `${files.length} resume(s) selected.`;
+
+    if (files.length > 25) {
+      status.textContent = "Maximum 25 resumes allowed. Please select again.";
+      fileInput.value = "";
+      countLabel.textContent = "Select up to 25 resumes.";
+      return;
+    }
+
+    status.textContent = "Ready to screen candidates.";
+  });
+
+  screenBtn.addEventListener("click", async () => {
+    const jdText = jdInput.value.trim();
+    const files = Array.from(fileInput.files || []);
+
+    if (!jdText) {
+      status.textContent = "Please enter a Job Description first.";
+      jdInput.focus();
+      return;
+    }
+
+    if (!files.length) {
+      status.textContent = "Please select at least one resume.";
+      return;
+    }
+
+    if (files.length > 25) {
+      status.textContent = "Maximum 25 resumes allowed.";
+      return;
+    }
+
+    screenBtn.disabled = true;
+    candidates = [];
+    candidateList.replaceChildren();
+    resultsBox.style.display = "none";
+    status.textContent = "Screening resumes...";
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      try {
+        const ext = file.name.split(".").pop().toLowerCase();
+        if (!["pdf", "docx", "txt"].includes(ext)) {
+          throw new Error("Unsupported file type");
+        }
+
+        const parsed = await readResumeFile(file);
+        if (!parsed || !parsed.text || !parsed.text.trim()) {
+          throw new Error("No readable text found");
+        }
+
+        const analysis = analyze(jdText, parsed.text, file.name);
+        const score = Number(
+          analysis.finalScore ??
+          analysis.matchScore ??
+          analysis.score
+        );
+
+        if (!Number.isFinite(score)) {
+          throw new Error("Could not calculate a match score");
+        }
+
+        candidates.push({
+          fileName: file.name,
+          name: analysis.candidate?.name || file.name,
+          score: Math.max(0, Math.min(100, score)),
+          matchedSkills: analysis.matchedSkills || [],
+          missingSkills: analysis.missingSkills || [],
+          analysis
+        });
+      } catch (error) {
+        candidates.push({
+          fileName: file.name,
+          name: file.name,
+          score: null,
+          matchedSkills: [],
+          missingSkills: [],
+          error: error.message
+        });
+      }
+
+      status.textContent = `Processed ${i + 1} of ${files.length} resumes...`;
+    }
+
+    candidates.sort((a, b) => {
+      if (a.score === null) return 1;
+      if (b.score === null) return -1;
+      return b.score - a.score;
+    });
+
+    renderCandidates();
+    updateBulkDashboard(candidates);
+    resultsBox.style.display = "block";
+
+    const successful = candidates.filter(c => c.score !== null).length;
+    summary.textContent =
+      `${successful} of ${files.length} resumes analyzed successfully.`;
+
+    status.textContent = "Screening complete.";
+    screenBtn.disabled = false;
+  });
+
+  function updateBulkDashboard(items) {
+  const successful = items.filter(c => c.score !== null);
+  const scores = successful.map(c => Number(c.score) || 0);
+
+  const shortlisted = successful.filter(c => Number(c.score) >= 70).length;
+
+  const average = scores.length
+    ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+    : 0;
+
+  const countSkills = (key) => {
+    const counts = {};
+
+    successful.forEach(candidate => {
+      (candidate[key] || []).forEach(skill => {
+        const name = String(skill).trim();
+        if (name) counts[name] = (counts[name] || 0) + 1;
+      });
+    });
+
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name]) => name);
+  };
+
+  document.getElementById("live-candidates").textContent = items.length;
+  document.getElementById("live-shortlisted").textContent = shortlisted;
+  document.getElementById("live-average").textContent = average + "%";
+  document.getElementById("live-top-skills").textContent =
+    countSkills("matchedSkills").join(", ") || "Not available";
+  document.getElementById("live-skill-gaps").textContent =
+    countSkills("missingSkills").join(", ") || "Not available";
+    // Update Bulk Screening Dashboard
+const bulkDashboard = document.getElementById("bulk-dashboard");
+
+if (bulkDashboard) {
+    bulkDashboard.style.display = "block";
+
+    document.getElementById("bulk-total-candidates").textContent =
+        items.length;
+
+    document.getElementById("bulk-shortlisted").textContent =
+        shortlisted;
+
+    document.getElementById("bulk-average").textContent =
+        average + "%";
+
+    document.getElementById("bulk-top-skills").textContent =
+        countSkills("matchedSkills").join(", ") || "Not available";
+
+    document.getElementById("bulk-skill-gaps").textContent =
+        countSkills("missingSkills").join(", ") || "Not available";
+}
+}
+  function renderCandidates() {
+    candidateList.replaceChildren();
+
+    candidates.forEach((candidate, index) => {
+      const card = document.createElement("details");
+      card.style.cssText =
+        "border:1px solid #ddd;border-radius:10px;padding:12px;margin:12px 0;";
+
+      const heading = document.createElement("summary");
+      heading.style.cursor = "pointer";
+      heading.textContent =
+        `#${index + 1} — ${candidate.name} — ` +
+        (candidate.score === null
+          ? "Could not analyze"
+          : `${candidate.score.toFixed(1)}% match`);
+
+      const body = document.createElement("div");
+      body.style.marginTop = "12px";
+
+      const fileName = document.createElement("p");
+      fileName.textContent = `File: ${candidate.fileName}`;
+      body.appendChild(fileName);
+
+      if (candidate.score === null) {
+        const error = document.createElement("p");
+        error.textContent = `Issue: ${candidate.error}`;
+        body.appendChild(error);
+      } else {
+        const matched = document.createElement("p");
+        matched.textContent =
+          "Matched skills: " + (candidate.matchedSkills.join(", ") || "None listed");
+
+        const missing = document.createElement("p");
+        missing.textContent =
+          "Missing skills: " + (candidate.missingSkills.join(", ") || "None listed");
+
+        body.append(matched, missing);
+      }
+
+      card.append(heading, body);
+      candidateList.appendChild(card);
+    });
+  }
+
+  csvBtn.addEventListener("click", () => {
+    if (!candidates.length) return;
+
+    const escapeCsv = value =>
+      `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+    const rows = [
+      ["Rank", "Candidate", "File", "Match Score", "Matched Skills", "Missing Skills", "Status"],
+      ...candidates.map((c, i) => [
+        i + 1,
+        c.name,
+        c.fileName,
+        c.score === null ? "" : c.score,
+        c.matchedSkills.join(", "),
+        c.missingSkills.join(", "),
+        c.score === null ? c.error : "Analyzed"
+      ])
+    ];
+
+    const csv = "\uFEFF" + rows.map(row => row.map(escapeCsv).join(",")).join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "screendesk-bulk-screening.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  clearBtn.addEventListener("click", () => {
+    fileInput.value = "";
+    jdInput.value = "";
+    candidates = [];
+    candidateList.replaceChildren();
+    resultsBox.style.display = "none";
+    countLabel.textContent = "Select up to 25 resumes.";
+    status.textContent = "Ready to screen candidates.";
+  });
+})();
+// ScreenDesk Navigation
+const singlePageBtn = document.getElementById("single-page-btn");
+const bulkPageBtn = document.getElementById("bulk-page-btn");
+const singleScreening = document.getElementById("single-screening");
+const bulkScreening = document.getElementById("bulk-screening");
+
+if (singlePageBtn && bulkPageBtn && singleScreening && bulkScreening) {
+  bulkScreening.style.display = "none";
+
+  singlePageBtn.addEventListener("click", () => {
+    singleScreening.style.display = "";
+    bulkScreening.style.display = "none";
+
+    singlePageBtn.classList.add("active");
+    bulkPageBtn.classList.remove("active");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  bulkPageBtn.addEventListener("click", () => {
+    singleScreening.style.display = "none";
+    bulkScreening.style.display = "block";
+console.log("Bulk section:", bulkScreening);
+console.log("Bulk display:", getComputedStyle(bulkScreening).display);
+console.log("Bulk height:", bulkScreening.offsetHeight);
+    bulkPageBtn.classList.add("active");
+    singlePageBtn.classList.remove("active");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://nloesvphzyncnyhdfxwp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_xk67T-ELRMU5eP3kPQx_zg_XEBQ7E-W";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+const authForm = document.getElementById("auth-form");
+const authMessage = document.getElementById("auth-message");
+const authToggle = document.getElementById("auth-toggle");
+
+let isSignUp = false;
+
+if (authToggle) {
+  authToggle.addEventListener("click", () => {
+    isSignUp = !isSignUp;
+
+    const nameInput = document.getElementById("auth-name");
+    const nameLabel = document.getElementById("name-label");
+    const submitButton = document.getElementById("auth-submit");
+
+    if (nameInput && nameLabel) {
+      nameInput.style.display = isSignUp ? "block" : "none";
+      nameLabel.style.display = isSignUp ? "block" : "none";
+      nameInput.required = isSignUp;
+    }
+
+    if (submitButton) {
+      submitButton.textContent = isSignUp ? "Sign Up" : "Login";
+    }
+
+    if (authMessage) authMessage.textContent = "";
+  });
+}
+
+if (authForm) {
+  authForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("auth-email").value.trim();
+    const password = document.getElementById("auth-password").value;
+    const fullName = document.getElementById("auth-name")?.value.trim();
+
+    if (authMessage) authMessage.textContent = "Please wait...";
+
+    try {
+      const result = isSignUp
+        ? await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName || "" } }
+          })
+        : await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+      if (result.error) throw result.error;
+
+      if (authMessage) {
+        authMessage.textContent = isSignUp
+          ? "Account created. Check your email to confirm your account."
+          : "Login successful!";
+      }
+      if (!isSignUp) {
+    document.getElementById("auth-screen").style.display = "none";
+    document.querySelector(".app").style.display = "block";
+}
+    } catch (error) {
+      if (authMessage) authMessage.textContent = error.message;
+    }
+  });
+}
 </script>
 </body>
 </html>
