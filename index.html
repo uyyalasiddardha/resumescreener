@@ -547,50 +547,248 @@ font-weight: 600;
   display: none;
 }
 </style>
+<style id="login-redesign-css">
+/* ===== ScreenDesk AI — login screen (scoped to #auth-screen) ===== */
+html:has(#auth-screen:not([style*="none"])){ background:#eef4ff; }
+#auth-screen{
+  --lg-ink:#1e1b4b; --lg-text:#475569; --lg-muted:#64748b;
+  --lg-primary:#4f46e5; --lg-primary-2:#7c3aed; --lg-line:#dbe3f5;
+  position:fixed; inset:0; z-index:1000; overflow-y:auto; overflow-x:hidden;
+  display:flex; min-height:100vh; min-height:100dvh;
+  padding:clamp(16px,4vw,48px);
+  font-family:var(--font-body,'Inter',system-ui,sans-serif);
+  color:var(--lg-text);
+  background:
+    radial-gradient(900px 600px at 8% 8%, rgba(125,211,252,.55), transparent 60%),
+    radial-gradient(800px 600px at 95% 90%, rgba(196,181,253,.55), transparent 60%),
+    linear-gradient(135deg,#e0f2fe 0%,#ffffff 48%,#ede9fe 100%);
+  -webkit-font-smoothing:antialiased;
+}
+#auth-screen::before{ /* faint dot grid */
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.55;
+  background-image:radial-gradient(rgba(79,70,229,.14) 1px, transparent 1.2px);
+  background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 30%, transparent 78%);
+          mask-image:radial-gradient(ellipse at center, #000 30%, transparent 78%);
+}
+#auth-screen *{ box-sizing:border-box; }
+#auth-screen .lg-wrap{
+  position:relative; width:100%; max-width:1120px; margin:auto;
+  display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,440px);
+  gap:clamp(32px,6vw,88px); align-items:center;
+}
+
+/* ---- left: hero + AI visual ---- */
+#auth-screen .lg-hero{ min-width:0; }
+#auth-screen .lg-eyebrow{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
+  border-radius:999px; background:rgba(255,255,255,.75); border:1px solid var(--lg-line);
+  color:var(--lg-primary); font-size:12.5px; font-weight:600; letter-spacing:.02em;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+#auth-screen .lg-eyebrow i{ width:7px; height:7px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 4px rgba(34,197,94,.18); }
+#auth-screen .lg-headline{
+  font-family:var(--font-display,'Space Grotesk',sans-serif);
+  font-size:clamp(30px,3.6vw,48px); line-height:1.1; letter-spacing:-.02em;
+  color:var(--lg-ink); margin:18px 0 14px; font-weight:700;
+}
+#auth-screen .lg-headline span{
+  background:linear-gradient(90deg,#2563eb,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+#auth-screen .lg-sub{ font-size:16.5px; line-height:1.65; max-width:46ch; margin:0 0 30px; color:var(--lg-text); }
+
+#auth-screen .lg-visual{ position:relative; height:290px; max-width:520px; }
+#auth-screen .lg-resume{
+  position:absolute; left:0; top:10px; width:290px; padding:18px;
+  background:rgba(255,255,255,.88); border:1px solid rgba(255,255,255,.9); border-radius:18px;
+  box-shadow:0 24px 50px -18px rgba(79,70,229,.35), 0 2px 6px rgba(30,27,75,.06);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  animation:lg-float 7s ease-in-out infinite;
+}
+#auth-screen .lg-rhead{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+#auth-screen .lg-avatar{ width:42px; height:42px; border-radius:50%; flex:none; background:linear-gradient(135deg,#7dd3fc,#a78bfa); display:grid; place-items:center; }
+#auth-screen .lg-bars{ flex:1; display:grid; gap:7px; }
+#auth-screen .lg-bar{ height:8px; border-radius:6px; background:#e2e8f0; }
+#auth-screen .lg-bar.w60{ width:60%; background:#c7d2fe; } #auth-screen .lg-bar.w80{ width:80%; } #auth-screen .lg-bar.w45{ width:45%; }
+#auth-screen .lg-lines{ display:grid; gap:8px; margin:6px 0 14px; }
+#auth-screen .lg-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+#auth-screen .lg-chip{ font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:999px; background:#eef2ff; color:#4338ca; }
+#auth-screen .lg-chip.ok{ background:#dcfce7; color:#15803d; }
+#auth-screen .lg-score{
+  position:absolute; right:0; top:0; width:210px; padding:16px; border-radius:18px;
+  background:rgba(255,255,255,.92); border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 24px 50px -18px rgba(37,99,235,.35), 0 2px 6px rgba(30,27,75,.06);
+  display:flex; align-items:center; gap:14px; animation:lg-float 8s ease-in-out -2s infinite;
+}
+#auth-screen .lg-ring{ position:relative; width:64px; height:64px; flex:none; }
+#auth-screen .lg-ring svg{ transform:rotate(-90deg); }
+#auth-screen .lg-ring b{ position:absolute; inset:0; display:grid; place-items:center; font:700 17px var(--font-display,'Space Grotesk',sans-serif); color:var(--lg-ink); }
+#auth-screen .lg-score small{ display:block; font-size:11.5px; color:var(--lg-muted); }
+#auth-screen .lg-score strong{ font-size:14px; color:var(--lg-ink); }
+#auth-screen .lg-insight{
+  position:absolute; right:14px; bottom:6px; width:240px; padding:14px 16px; border-radius:16px;
+  background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; font-size:12.5px; line-height:1.5;
+  box-shadow:0 22px 44px -16px rgba(79,70,229,.6); animation:lg-float 9s ease-in-out -4s infinite;
+}
+#auth-screen .lg-insight b{ display:flex; align-items:center; gap:6px; font-size:12px; letter-spacing:.04em; text-transform:uppercase; opacity:.9; margin-bottom:4px; }
+@keyframes lg-float{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
+
+/* ---- right: card ---- */
+#auth-screen .lg-card{
+  width:100%; padding:clamp(24px,4vw,40px); border-radius:26px;
+  background:rgba(255,255,255,.82); border:1px solid rgba(255,255,255,.95);
+  backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3);
+  box-shadow:0 40px 80px -30px rgba(79,70,229,.35), 0 8px 24px -8px rgba(30,27,75,.10);
+}
+#auth-screen .lg-brand{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+#auth-screen .lg-logo{ width:44px; height:44px; flex:none; border-radius:13px; display:grid; place-items:center; background:linear-gradient(135deg,#3b82f6,#7c3aed); box-shadow:0 10px 20px -8px rgba(79,70,229,.6); }
+#auth-screen .lg-card h1{
+  margin:0; font-family:var(--font-display,'Space Grotesk',sans-serif); font-size:24px; font-weight:700;
+  letter-spacing:-.01em; color:var(--lg-ink); line-height:1.15;
+}
+#auth-screen .lg-tag{ margin:0 0 26px; font-size:14px; color:var(--lg-muted); }
+#auth-screen .lg-welcome{ margin:0 0 20px; font-size:14.5px; line-height:1.55; color:var(--lg-text); }
+
+#auth-screen label{ display:block; margin:0 0 6px; font-size:13px; font-weight:600; color:var(--lg-ink); }
+#auth-screen input{
+  display:block; width:100%; height:48px; margin:0 0 16px; padding:0 14px 0 44px;
+  font:500 15px var(--font-body,'Inter',sans-serif); color:var(--lg-ink);
+  background-color:rgba(255,255,255,.95); background-repeat:no-repeat; background-position:14px center; background-size:18px;
+  border:1.5px solid var(--lg-line); border-radius:12px; outline:none;
+  transition:border-color .18s, box-shadow .18s, background-color .18s;
+}
+#auth-screen input::placeholder{ color:#94a3b8; font-weight:400; }
+#auth-screen input:hover{ border-color:#c1cdf0; }
+#auth-screen input:focus{ border-color:var(--lg-primary); box-shadow:0 0 0 4px rgba(79,70,229,.15); background-color:#fff; }
+#auth-screen #auth-name{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"); }
+#auth-screen #auth-email{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='3'/%3E%3Cpath d='m22 7-10 6L2 7'/%3E%3C/svg%3E"); }
+#auth-screen #auth-password{ margin-bottom:22px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='3'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E"); }
+
+#auth-screen #auth-submit{
+  display:flex; align-items:center; justify-content:center; gap:8px; width:100%; height:50px; padding:0 18px;
+  font:600 15.5px var(--font-body,'Inter',sans-serif); letter-spacing:.01em; color:#fff; cursor:pointer;
+  border:0; border-radius:12px;
+  background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);
+  box-shadow:0 12px 24px -10px rgba(79,70,229,.65), inset 0 1px 0 rgba(255,255,255,.25);
+  transition:transform .15s, box-shadow .2s, filter .2s;
+}
+#auth-screen #auth-submit::after{ content:"→"; transition:transform .2s; }
+#auth-screen #auth-submit:hover{ transform:translateY(-1px); filter:brightness(1.06); box-shadow:0 16px 30px -10px rgba(79,70,229,.75), inset 0 1px 0 rgba(255,255,255,.25); }
+#auth-screen #auth-submit:hover::after{ transform:translateX(3px); }
+#auth-screen #auth-submit:active{ transform:translateY(0); }
+#auth-screen #auth-submit:focus-visible, #auth-screen #auth-toggle:focus-visible{ outline:3px solid rgba(79,70,229,.4); outline-offset:3px; }
+
+#auth-screen .lg-switch{ margin:18px 0 0; text-align:center; font-size:14px; color:var(--lg-text); }
+#auth-screen #auth-toggle{
+  padding:2px 4px; margin-left:2px; font:600 14px var(--font-body,'Inter',sans-serif);
+  color:var(--lg-primary); background:none; border:0; border-radius:6px; cursor:pointer;
+}
+#auth-screen #auth-toggle:hover{ text-decoration:underline; text-underline-offset:3px; }
+#auth-screen #auth-message{
+  margin:14px 0 0; padding:11px 14px; font-size:13.5px; line-height:1.5; text-align:center;
+  color:#3730a3; background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px;
+}
+#auth-screen #auth-message:empty{ display:none; }
+#auth-screen .lg-trust{ display:flex; align-items:center; justify-content:center; gap:7px; margin:22px 0 0; font-size:12.5px; color:var(--lg-muted); }
+
+/* ---- responsive ---- */
+@media (max-width:980px){
+  #auth-screen .lg-wrap{ grid-template-columns:minmax(0,460px); justify-content:center; gap:28px; }
+  #auth-screen .lg-hero{ order:2; text-align:center; }
+  #auth-screen .lg-sub{ margin-left:auto; margin-right:auto; }
+  #auth-screen .lg-visual{ margin:0 auto; max-width:460px; text-align:left; }
+  #auth-screen .lg-resume{ width:240px; }
+  #auth-screen .lg-score{ width:200px; padding:14px; }
+  #auth-screen .lg-insight{ right:0; }
+}
+@media (max-width:640px){
+  #auth-screen{ padding:16px; }
+  #auth-screen .lg-hero{ display:none; }
+  #auth-screen .lg-card{ border-radius:22px; }
+}
+@media (max-width:360px){ #auth-screen .lg-card{ padding:20px 16px; } }
+@media (max-height:520px) and (min-width:641px){ #auth-screen .lg-visual{ display:none; } }
+@media (prefers-reduced-motion:reduce){ #auth-screen *{ animation:none !important; transition:none !important; } }
+</style>
+
 </head>
 <body>
-  <div id="auth-screen" style="display:flex;min-height:100vh;align-items:center;justify-content:center;background:#101114;color:#fff;font-family:Arial,sans-serif;padding:24px;box-sizing:border-box">
-  <div style="width:100%;max-width:420px;background:#1b1c20;border:1px solid #39352b;border-radius:20px;padding:32px;box-sizing:border-box">
-    <h1 style="color:#D9A548;margin:0 0 8px">ScreenDesk AI</h1>
-    <p style="color:#aaa;margin-bottom:28px">AI-powered resume screening</p>
+  <div id="auth-screen" style="display:flex">
+  <div class="lg-wrap">
 
-    <div style="display:none;gap:10px;margin-bottom:22px">
-      <button id="login-tab" type="button">Login</button>
-      <button id="signup-tab" type="button">Sign up</button>
+    <!-- Left: decorative AI / recruitment visual (not interactive) -->
+    <section class="lg-hero" aria-hidden="true">
+      <span class="lg-eyebrow"><i></i> AI resume screening, in seconds</span>
+      <h2 class="lg-headline">Find the right candidates <span>faster, with AI</span></h2>
+      <p class="lg-sub">Match resumes to job descriptions, surface missing keywords and rank candidates with clear, explainable scores.</p>
+
+      <div class="lg-visual">
+        <div class="lg-resume">
+          <div class="lg-rhead">
+            <div class="lg-avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="lg-bars"><div class="lg-bar w60"></div><div class="lg-bar w45"></div></div>
+          </div>
+          <div class="lg-lines"><div class="lg-bar"></div><div class="lg-bar w80"></div><div class="lg-bar"></div><div class="lg-bar w60"></div></div>
+          <div class="lg-chips"><span class="lg-chip ok">Python</span><span class="lg-chip ok">SQL</span><span class="lg-chip">Leadership</span><span class="lg-chip ok">APIs</span></div>
+        </div>
+
+        <div class="lg-score">
+          <div class="lg-ring">
+            <svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="#e0e7ff" stroke-width="7"/><circle cx="32" cy="32" r="26" fill="none" stroke="url(#lgGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="13"/><defs><linearGradient id="lgGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs></svg>
+            <b>92%</b>
+          </div>
+          <div><small>Match score</small><strong>Strong fit</strong></div>
+        </div>
+
+        <div class="lg-insight">
+          <b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg> AI insight</b>
+          Matches 11 of 12 required skills. Missing: Docker.
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: login card (IDs below are used by the Supabase script — do not rename) -->
+    <div class="lg-card">
+      <div class="lg-brand">
+        <div class="lg-logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 44 44" fill="none"><circle cx="20" cy="20" r="12" stroke="#fff" stroke-width="3"/><line x1="29" y1="29" x2="39" y2="39" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="20" r="5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg>
+        </div>
+        <h1>ScreenDesk AI</h1>
+      </div>
+      <p class="lg-tag">AI-powered resume screening</p>
+      <p class="lg-welcome">Log in to your account, or sign up to start screening resumes.</p>
+
+      <div style="display:none;gap:10px;margin-bottom:22px">
+        <button id="login-tab" type="button">Login</button>
+        <button id="signup-tab" type="button">Sign up</button>
+      </div>
+
+      <form id="auth-form">
+        <label for="auth-name" id="name-label" style="display:none">Full name</label>
+        <input id="auth-name" autocomplete="name" placeholder="Full name" style="display:none">
+
+        <label for="auth-email">Email address</label>
+        <input id="auth-email" type="email" autocomplete="email" required placeholder="you@example.com">
+
+        <label for="auth-password">Password</label>
+        <input id="auth-password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters">
+
+        <button id="auth-submit" type="submit">Login</button>
+
+        <p class="lg-switch">
+          Don't have an account?
+          <button type="button" id="auth-toggle">Sign Up</button>
+        </p>
+
+        <p id="auth-message" role="status"></p>
+      </form>
+
+      <p class="lg-trust">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Secure sign-in powered by Supabase
+      </p>
     </div>
 
-    <form id="auth-form">
-      <label for="auth-name" id="name-label" style="display:none">Full name</label>
-      <input id="auth-name" autocomplete="name" placeholder="Full name"
-        style="display:none;width:100%;padding:13px;margin:8px 0;border-radius:8px;box-sizing:border-box">
-
-      <label for="auth-email">Email address</label>
-      <input id="auth-email" type="email" autocomplete="email" required
-        placeholder="you@example.com"
-        style="width:100%;padding:13px;margin:8px 0 16px;border-radius:8px;box-sizing:border-box">
-
-      <label for="auth-password">Password</label>
-      <input id="auth-password" type="password" autocomplete="current-password"
-        minlength="8" required placeholder="At least 8 characters"
-        style="width:100%;padding:13px;margin:8px 0 20px;border-radius:8px;box-sizing:border-box">
-
-      <button id="auth-submit" type="submit"
-        style="width:100%;padding:14px;background:#D9A548;color:#17191f;border:0;border-radius:8px;font-weight:bold;cursor:pointer">
-        Login
-      </button>
-      <p style="text-align:center;margin-top:14px;color:#ddd">
-  Don't have an account?
-  <button
-    type="button"
-    id="auth-toggle"
-    style="background:none;border:none;color:#D9A548;cursor:pointer">
-    Sign Up
-  </button>
-</p>
-
-<p id="auth-message" role="status"
-   style="color:#ddd;line-height:1.5"></p>
-    </form>
   </div>
 </div>
 <div class="app">
