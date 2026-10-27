@@ -483,6 +483,26 @@ html:has(#auth-screen:not([style*="none"])){ background:#eef4ff; }
 #auth-screen #auth-message:empty{ display:none; }
 #auth-screen .lg-trust{ display:flex; align-items:center; justify-content:center; gap:7px; margin:22px 0 0; font-size:12.5px; color:var(--lg-muted); }
 
+/* ---- personal branding footer ---- */
+#auth-screen .lg-side{ min-width:0; width:100%; }
+#auth-screen .lg-credit{
+  margin:22px 0 4px; text-align:center; font-size:15.5px; font-weight:500; line-height:1.4; letter-spacing:.01em; color:#475569;
+}
+#auth-screen .lg-credit a{
+  position:relative; display:inline-block; padding:1px 2px; font-weight:600; text-decoration:none;
+  color:#4338ca; /* fallback if background-clip text is unsupported */
+  background:linear-gradient(90deg,#4338ca 0%,#6d28d9 100%); -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; transition:filter .2s, transform .2s;
+}
+#auth-screen .lg-credit a::after{
+  content:""; position:absolute; left:2px; right:2px; bottom:-2px; height:2px; border-radius:2px;
+  background:linear-gradient(90deg,#4338ca,#6d28d9); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
+}
+#auth-screen .lg-credit a:hover{ filter:brightness(1.2) saturate(1.1); transform:translateY(-1px); }
+#auth-screen .lg-credit a:hover::after, #auth-screen .lg-credit a:focus-visible::after{ transform:scaleX(1); }
+#auth-screen .lg-credit a:focus-visible{ outline:2px solid rgba(79,70,229,.5); outline-offset:3px; border-radius:4px; }
+@media (max-width:640px){ #auth-screen .lg-credit{ font-size:14.5px; margin-top:20px; } }
+
 /* ---- responsive ---- */
 @media (max-width:980px){
   #auth-screen .lg-wrap{ grid-template-columns:minmax(0,460px); justify-content:center; gap:28px; }
@@ -540,6 +560,7 @@ html:has(#auth-screen:not([style*="none"])){ background:#eef4ff; }
     </section>
 
     <!-- Right: login card (IDs below are used by the Supabase script — do not rename) -->
+    <div class="lg-side">
     <div class="lg-card">
       <div class="lg-brand">
         <div class="lg-logo" aria-hidden="true">
@@ -579,6 +600,9 @@ html:has(#auth-screen:not([style*="none"])){ background:#eef4ff; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Secure sign-in powered by Supabase
       </p>
+    </div>
+
+    <p class="lg-credit">Powered by <a href="https://www.linkedin.com/in/uyyalasiddardha" target="_blank" rel="noopener noreferrer" aria-label="Uyyala Siddardha on LinkedIn (opens in a new tab)">Uyyala Siddardha</a></p>
     </div>
 
   </div>
